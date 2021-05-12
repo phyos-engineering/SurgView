@@ -103,7 +103,7 @@ class UIViewer:
 		# Show results
 		end_time = time.time()
 
-		print("Execution Time: {}".format(start_time - end_time))
+		print("Execution Time: {}".format(end_time-start_time))
 		cv.imshow('interface', interface_img)
 		cv.imshow('widget', widget_img)
 		cv.imshow('partial_img', partial_image)
