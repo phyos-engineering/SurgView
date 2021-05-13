@@ -1,5 +1,5 @@
 # !/usr/bin/env python
-# title           :viewer.py
+# title           :view.py
 # description     :Interface Mapping Class using OpenCV
 # author          :Juan Maldonado
 # date            :5/11/2021
@@ -15,19 +15,17 @@ import os
 import argparse
 
 """
-The UIViewer class helps map out the screen locations of interface widgets using OpenCV.
+The UIReader class helps map out the screen locations of interface widgets using OpenCV.
 """
 
 
-class UIViewer:
-	def __init__(self, program_name: str = None, page_name: str = None):
+class UIReader:
+	def __init__(self):
 		"""
-		Constructor
-		:param program_name: Name of program we're trying to automate mouse/keyboard input.
-		:param page_name: Page of program we're trying to map out.
+		Constructor. Initializes video feed and configures appropriate directories (tentative).
 		"""
-		self.program_name = program_name  # To Do: Exception Handling
-		self.page_name = page_name  # To Do: Exception Handling
+		self.program_name = None  # To Do: Exception Handling
+		self.page_name = None  # To Do: Exception Handling
 		self.assets_directory = "/interface_assets/"  # Directory location of templates
 		self.gui_map = dict()  # Dictionary storing locations of widgets mapped by map_interface()
 		self.capture_feed = cv.VideoCapture(0)  # Device (USB Capture Card) outputting video feed of program.

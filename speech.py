@@ -48,7 +48,7 @@ class SpeechEngine:
 		self.keyword_audio_config = AudioConfig(use_default_microphone=True)  # Configure Audio Input
 		self.keyword_recognizer = KeywordRecognizer(audio_config=self.keyword_audio_config)
 
-	def recognize_intent(self):
+	def recognize_intent(self) -> json:
 		"""
 		Sends voice command to LUIS.ai and returns response containing matched intent.
 		"""
@@ -56,7 +56,7 @@ class SpeechEngine:
 		if response.reason == ResultReason.RecognizedIntent:
 			return json.loads(response.properties.get(PropertyId.LanguageUnderstandingServiceResponse_JsonResult))
 
-	def detect_activation_word(self):
+	def detect_activation_word(self) -> bool:
 		"""
 		Listens (but not records) for activation word (WAKE UP).
 		:return: Boolean Value: True -> Keyword Recognized, False -> Keyword Not Recognized

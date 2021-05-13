@@ -1,5 +1,5 @@
 # !/usr/bin/env python
-# title           :input_controller.py
+# title           :controller.py
 # description     :Class in charge of establishing communication between Arduino Leonardo and Pi4.
 # author          :Sebastian Maldonado
 # date            :5/13/21
@@ -12,11 +12,11 @@
 from serial import Serial
 
 """
-The InputController class allows us to interface with the Arduino Leonardo board via serial communication
+The SerialController class allows us to interface with the Arduino Leonardo board via serial communication.
 """
 
 
-class InputController:
+class SerialController:
 	def __init__(self):
 		"""
 		Constructor. Assigns serial port USB0 as communication medium between Arduino Leonardo and Pi4.
