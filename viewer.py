@@ -35,10 +35,16 @@ class UIViewer:
 		self.template_filepath = None
 
 	def read_video_feed(self):
+		"""
+		Read one frame from the video feed (USB Capture Card) and write to file.
+		"""
 		ret, frame = self.capture_feed.read()
 		cv.imwrite("current_view.png", frame)
 
 	def test_video_feed(self):
+		"""
+		Test video feed.
+		"""
 		while True:
 			ret, frame = self.capture_feed.read()
 			cv.imshow('Frame', frame)
@@ -103,7 +109,7 @@ class UIViewer:
 		# Show results
 		end_time = time.time()
 
-		print("Execution Time: {}".format(end_time-start_time))
+		print("Execution Time: {}".format(end_time - start_time))
 		cv.imshow('interface', interface_img)
 		cv.imshow('widget', widget_img)
 		cv.imshow('partial_img', partial_image)
