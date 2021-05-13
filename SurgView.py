@@ -9,3 +9,20 @@
 # python_version  :3.6.8
 # conda_version   :4.8.3
 # =================================================================================================================
+
+from events import EventHandler
+
+"""
+Driver Program
+"""
+
+
+def main():
+    event_manager = EventHandler()
+    event_manager.listen()
+
+
+if __name__ == "__main__":
+    main()
+
+

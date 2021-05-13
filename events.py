@@ -11,6 +11,8 @@
 from speech import SpeechEngine
 from view import UIReader
 from controller import SerialController
+from playsound import playsound
+import json
 
 
 class EventHandler:
@@ -20,12 +22,32 @@ class EventHandler:
 		"""
 		self.speech_engine = SpeechEngine()
 		self.interface_reader = UIReader()
-		self.serial_controller = SerialController()
+		#self.serial_controller = SerialController()
+		self.intent_accuracy_threshold = 0.50
 
 	def listen(self):
-		return
+		"""
+		Listen for activation word and prompt user with sound to give voice command.
+		"""
+		keep_listening = True
+		while keep_listening:
+			if self.speech_engine.detect_activation_word():
+				playsound("prompt.mp3")
+				self.process_intent(self.speech_engine.recognize_intent())
 
-	def process_intent(self):
+	def process_intent(self, intent_result: json):
+		intent_score = intent_result["topScoringIntent"]["score"]
+		if intent_score >= self.intent_accuracy_threshold:
+
+			intent = intent_result["topScoringIntent"]["intent"]
+
+			if intent == "ScanInterface":
+				self.interface_reader.capture_feed()
+				self.interface_reader.map_interface()
+
+
+
+
 		return
 
 	def execute_workflow(self, flag: int):
