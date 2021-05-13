@@ -146,7 +146,6 @@ class UIReader:
                 print("Finding: {}".format(image))
                 widget_img = cv.imread(relative_path)
 
-                print("Elapsed Time: {}".format(end_time - start_time))
                 # Convert template image to Grayscale Coloring and it's threshold to binary
 
                 partial_image = cv.cvtColor(widget_img, cv.COLOR_RGB2GRAY)
