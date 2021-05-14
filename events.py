@@ -22,7 +22,7 @@ class EventHandler:
 		"""
 		self.speech_engine = SpeechEngine()
 		self.interface_reader = UIReader()
-		#self.serial_controller = SerialController()
+		# self.serial_controller = SerialController()
 		self.intent_accuracy_threshold = 0.50
 
 	def listen(self):
@@ -38,15 +38,11 @@ class EventHandler:
 	def process_intent(self, intent_result: json):
 		intent_score = intent_result["topScoringIntent"]["score"]
 		if intent_score >= self.intent_accuracy_threshold:
-
 			intent = intent_result["topScoringIntent"]["intent"]
 
 			if intent == "ScanInterface":
 				self.interface_reader.capture_feed()
 				self.interface_reader.map_interface()
-
-
-
 
 		return
 
