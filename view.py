@@ -249,7 +249,7 @@ def main():
     """
     viewer = UIReader()
     viewer.source_filepath = "home_page_root.jpg"
-    viewer.contour_matching("vitals_camera.jpg", show_results=False)
+    viewer.contour_matching("volume_up.jpg", show_results=False)
     # viewer.match_template(2)
     # viewer.read_video_feed()
 
