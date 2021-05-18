@@ -74,7 +74,7 @@ class UIReader:
 		text = pytesseract.image_to_string(image=threshold.copy(), lang='eng',
 										   config='--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789')
 		end_time = time.time()
-		print("Extracting Text: {} - Elapsed Time: {}".format(text, (end_time - start_time)))
+		print("Extracting Text: {} Elapsed Time: " + "{:.2f}".format(text, (end_time - start_time)))
 		return text
 
 	def select_mapping_method(self, flag: str, show_steps: bool):
@@ -200,7 +200,7 @@ class UIReader:
 
 		self.show_result("Target Area With Rects", rects_result, show_results)
 		end_time = time.time()
-		print("Contour Matching - Elapsed Time: {}".format(end_time - start_time))
+		print("Contour Matching - Elapsed Time: " + "{:.2f}".format(end_time - start_time))
 
 	def map_interface(self):
 		print("Mapping Interface...")
