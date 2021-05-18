@@ -71,12 +71,13 @@ class UIReader:
 		start_time = time.time()
 		img_gray = cv.cvtColor(extracted_image, cv.COLOR_BGR2GRAY)
 		ret, threshold = cv.threshold(img_gray, 127, 255, 0)
-		text = pytesseract.image_to_string(image=threshold.copy(), lang='eng',
-										   config='--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789')
+		extracted_text = pytesseract.image_to_string(image=threshold.copy(), lang='eng',
+													 config='--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789')
+		cleaned_text = ''.join(e for e in extracted_text if e.isalnum()).lower()
 		end_time = time.time()
 		elapsed_time = end_time - start_time
-		print("Extracting Text: {} Elapsed Time: {}s".format(text, round(elapsed_time, 2)))
-		return text
+		print("Extracting Text: {} - Elapsed Time: {}s".format(cleaned_text, round(elapsed_time, 2)))
+		return cleaned_text
 
 	def select_mapping_method(self, flag: str, show_steps: bool):
 		"""
