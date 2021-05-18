@@ -77,10 +77,11 @@ class UIReader:
 		print("Extracting Text: {} - Elapsed Time: {}".format(text, (end_time - start_time)))
 		return text
 
-	def select_mapping_method(self, flag: str):
+	def select_mapping_method(self, flag: str, show_steps: bool):
 		"""
 		Selects mapping method
 		:param flag: Mapping method name. Options -> [TEMPLATE_MATCHING, FEATURE_MATCHING]
+		:param show_steps: Display windows showing image transformations. True->Show, False-> Don't Show
 		"""
 		if flag == "TEMPLATE_MATCHING":
 			self.template_matching()
@@ -89,7 +90,7 @@ class UIReader:
 			print("Not implemented yet")
 
 		if flag == "CONTOUR_MATCHING":
-			print("Not implemented yet")
+			self.contour_matching(show_steps)
 		else:
 			print("Mapping Method Provided Not Found")
 
@@ -105,11 +106,11 @@ class UIReader:
 			cv.waitKey(0)
 			cv.destroyWindow(title)
 
-	def contour_matching(self, filepath: str, show_results: bool):
+	def contour_matching(self, show_results: bool):
 		start_time = time.time()
 
+		image = cv.imread(self.template_filepath)
 		# Read Image
-		image = cv.imread(filepath)
 		self.show_result("Target image", image, show_results)
 		target_result = image.copy()
 
@@ -177,16 +178,29 @@ class UIReader:
 		# Render rects on detected objects
 		rects_result = interface.copy()
 		for i in targets:
+			# Render a bounding rectangle for each target contour
 			x, y, w, h = cv.boundingRect(i)
+
+			# Capture region of interest within bounded rectangle (name of button)
 			button = rects_result[y:y + h, x:x + w]
 			self.show_result("button", button, show_results)
-			print(self.extract_text(button))
+
+			# Extract name of button using OCR
+			button_label = self.extract_text(button)
 			cv.rectangle(rects_result, pt1=(x, y), pt2=(x + w, y + h), color=(0, 0, 255), thickness=2)
 
-		self.show_result("Target Area With Rects", rects_result, show_results)
+			# Calculate & Render Center Point of Rectangle
+			center_x = int(x + w / 2)
+			center_y = int(y + h / 2)
 
+			cv.circle(rects_result, (center_x, center_y), radius=2, thickness=-1, color=(0, 0, 255))
+
+			# Add Widget To Map
+			self.gui_map.add_widget(button_label, center_x, center_y)
+
+		self.show_result("Target Area With Rects", rects_result, show_results)
 		end_time = time.time()
-		print("Elapsed Time: {}".format(end_time - start_time))
+		print("Contour Matching - Elapsed Time: {}".format(end_time - start_time))
 
 	def map_interface(self):
 		print("Mapping Interface...")
@@ -251,26 +265,22 @@ class UIReader:
 
 
 def main():
-	"""
-	ap = argparse.ArgumentParser(description="Test Mapping Methods")
-	ap.add_argument("--mapping_method", required=True, choices=["TEMPLATE_MATCHING", "FEATURE_MATCHING"],
-					help="Mapping method used to locate widgets")
-	ap.add_argument("--source", required=True, help="Source image where template matching will occur")
-	ap.add_argument("--template", required=True, help="Template image that will be searched in source")
+	ap = argparse.ArgumentParser(description="Test Mapping Methods.")
+	ap.add_argument("--map_method", nargs='?', default="CONTOUR_MATCHING", type=str,
+					choices=["TEMPLATE_MATCHING", "FEATURE_MATCHING", "CONTOUR_MATCHING"],
+					help="Mapping method applied to locate widgets.")
+	ap.add_argument("--source", nargs='?', default="home_page_root.jpg", type=str,
+					help="Source image where mapping will be performed.")
+	ap.add_argument("--template", nargs='?', default="vitals_camera.jpg",
+					help="Template that will be searched in source image.", type=str)
+	ap.add_argument("--steps", nargs='?', default=0, type=bool, help="Display image transformations on screen.")
 	args = vars(ap.parse_args())
-	"""
-	viewer = UIReader()
-	viewer.source_filepath = "home_page_root.jpg"
-	viewer.contour_matching("vitals_camera.jpg", show_results=True)
-	# viewer.extract_text("vitals_camera.jpg")
-	# viewer.match_template(2)
-	# viewer.read_video_feed()
 
-	"""
+	viewer = UIReader()
 	viewer.source_filepath = args["source"]
 	viewer.template_filepath = args["template"]
-	viewer.select_mapping_method(args["mapping_method"])
-	"""
+	viewer.select_mapping_method(args["map_method"], args["steps"])
+	viewer.gui_map.get_map()
 
 
 if __name__ == "__main__":
