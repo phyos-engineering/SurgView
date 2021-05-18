@@ -69,12 +69,12 @@ class UIReader:
 		Extract text from an image using Google Tesseract.
 		"""
 		start_time = time.time()
-		print("Extracting Text From Image...")
-		text = pytesseract.image_to_string(image=extracted_image, lang='eng',
+		img_gray = cv.cvtColor(extracted_image, cv.COLOR_BGR2GRAY)
+		ret, threshold = cv.threshold(img_gray, 127, 255, 0)
+		text = pytesseract.image_to_string(image=threshold.copy(), lang='eng',
 										   config='--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789')
-		print(text)
 		end_time = time.time()
-		print("Extracting Text -Elapsed Time: {}".format(end_time - start_time))
+		print("Extracting Text: {} - Elapsed Time: {}".format(text, (end_time - start_time)))
 		return text
 
 	def select_mapping_method(self, flag: str):
