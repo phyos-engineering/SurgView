@@ -32,15 +32,20 @@ class UIReader:
 		self.page_name = None  # To Do: Exception Handling
 		self.assets_directory = "/interface_assets/"  # Directory location of templates.
 		self.gui_map = ScreenMap()  # Class of charge of tracking widgets identified by UIReader.
-		self.capture_feed = cv.VideoCapture(0)  # Device (USB Capture Card) outputting video feed of program.
+		self.capture_feed = None  # Device (USB Capture Card) outputting video feed of program.
 		self.source_filepath = None
 		self.template_filepath = None
+
+	def config_video_stream(self):
+		self.capture_feed = cv.VideoCapture(0)
+		self.capture_feed.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+		self.capture_feed.set(cv.CAP_PROP_FRAME_WIDTH, 1080)
 
 	def read_video_feed(self):
 		"""
 		Read one frame from the video feed (USB Capture Card) and write to file.
 		"""
-		ret, frame = self.capture_feed.read()
+		ret, frame = self.capture_feed.grab()
 		cv.imshow("test?", frame)
 		cv.waitKey(0)
 		cv.imwrite("current_view.png", frame)
@@ -338,9 +343,13 @@ def main():
 	args = vars(ap.parse_args())
 
 	viewer = UIReader()
+	viewer.config_video_stream()
+	viewer.read_video_feed()
+	"""
 	viewer.source_filepath = "interface_assets/steris/home_page_templates/home_page_root.jpg"
 	viewer.map_interface()
 	viewer.gui_map.get_map()
+	"""
 
 
 if __name__ == "__main__":
