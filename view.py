@@ -64,27 +64,58 @@ class UIReader:
 		self.capture_feed.release()
 		cv.destroyAllWindows()
 
-	def extract_text(self, extracted_image) -> str:  # TO DO: Pass filepath or mat?
+	@staticmethod
+	def extract_text(extracted_image, flag: str) -> str:  # TO DO: Pass filepath or mat?
 		"""
 		Extract text from an image using Google Tesseract.
+		:param extracted_image: button image returned by contour mapping
+		:param flag:
 		"""
 		start_time = time.time()
+		# Enlarge image (helps with OCR accuracy)
 		enlarged_image = cv.resize(src=extracted_image, dsize=(0, 0), fx=3, fy=3)
-		img_gray = cv.cvtColor(enlarged_image, cv.COLOR_BGR2GRAY)
-		ret, threshold = cv.threshold(img_gray, 127, 255, 0)
-		extracted_text = pytesseract.image_to_string(image=threshold.copy(), lang='eng',
-													 config='--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789')
+		# We need the image in grayscale to apply thresholding
+		gray_image = cv.cvtColor(enlarged_image, cv.COLOR_BGR2GRAY)
+
+		# We can't extract a label from the main window 
+		if flag == "main_window_template":
+			return "fullscreen"
+
+		threshold = None
+
+		# We'll apply a different thresholding technique based on the button's features.
+		if flag == "bottom_buttons_template":
+			threshold = \
+				cv.threshold(src=gray_image, thresh=127, maxval=255, type=cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
+
+		if flag == "destinations_template":
+			threshold = cv.threshold(src=gray_image, thresh=127, maxval=255, type=cv.THRESH_BINARY + cv.THRESH_OTSU)[1]
+
+		if flag == "sources_template":
+			threshold = cv.threshold(src=gray_image, thresh=127, maxval=255, type=cv.THRESH_BINARY)[1]
+
+		# Apply a bit of sharpening given that thresholding may have unsharpened image.
+		final_image = cv.GaussianBlur(src=threshold, ksize=(11, 11), sigmaX=0)
+		final_image = cv.medianBlur(src=final_image, ksize=1)
+
+		# Run OCR on image
+		extracted_text = pytesseract.image_to_string(image=final_image.copy(), lang='eng',
+													 config='--psm 3 --oem 3 --dpi 300 -l eng -c '
+															'tessedit_char_whitelist=0123456789')
+		# Remove punctuation and etc from string
 		cleaned_text = ''.join(e for e in extracted_text if e.isalnum()).lower()
 		end_time = time.time()
+
 		elapsed_time = end_time - start_time
 		print("Extracting Text: {} - Elapsed Time: {}s".format(cleaned_text, round(elapsed_time, 2)))
 		return cleaned_text
 
-	def select_mapping_method(self, flag: str, show_steps: bool):
+	def select_mapping_method(self, flag: str, template_flag: str, show_steps: bool):
 		"""
 		Selects mapping method
 		:param flag: Mapping method name. Options -> [TEMPLATE_MATCHING, FEATURE_MATCHING]
 		:param show_steps: Display windows showing image transformations. True->Show, False-> Don't Show
+		:param template_flag: flag needed to apply correct thresholding technique based on button feature
 		"""
 		if flag == "TEMPLATE_MATCHING":
 			self.template_matching()
@@ -93,25 +124,26 @@ class UIReader:
 			print("Not implemented yet")
 
 		if flag == "CONTOUR_MATCHING":
-			self.contour_matching(show_steps)
+			self.contour_matching(show_steps, template_flag)
 		else:
 			print("Mapping Method Provided Not Found")
 
 	def show_result(self, title: str, image, is_enabled: bool):
 		"""
 		See the result of an OpenCV procedure in a new window
-		:param title:
-		:param image:
-		:param is_enabled:
+		:param title: Title of result window.
+		:param image: The image rendered in window.
+		:param is_enabled: Flag whether showing window result is enabled.
 		"""
 		if is_enabled:
 			cv.imshow(title, image)
 			cv.waitKey(0)
 			cv.destroyWindow(title)
 
-	def contour_matching(self, show_results: bool):
+	def contour_matching(self, show_results: bool, template_flag: str):
 		start_time = time.time()
 
+		#
 		image = cv.imread(self.template_filepath)
 		# Read Image
 		self.show_result("Target image", image, show_results)
@@ -189,7 +221,7 @@ class UIReader:
 			self.show_result("button", button, show_results)
 
 			# Extract name of button using OCR
-			button_label = self.extract_text(button)
+			button_label = self.extract_text(button, template_flag)
 			cv.rectangle(rects_result, pt1=(x, y), pt2=(x + w, y + h), color=(0, 0, 255), thickness=2)
 
 			# Calculate & Render Center Point of Rectangle
@@ -207,7 +239,32 @@ class UIReader:
 		print("Contour Matching - Elapsed Time: {}s".format(round(elapsed_time, 2)))
 
 	def map_interface(self):
-		print("Mapping Interface...")
+
+		start_time = time.time()
+
+		# Find Main Window
+		self.template_filepath = "interface_assets/steris/home_page_templates/main_window.jpg"
+		self.contour_matching(show_results=False, template_flag="main_window_template")
+
+		# Find Sources
+		self.template_filepath = "interface_assets/steris/home_page_templates/vitals_camera.jpg"
+		self.contour_matching(show_results=False, template_flag="sources_template")
+
+		# Find Destinations
+		self.template_filepath = "interface_assets/steris/home_page_templates/surgical_display_1.jpg"
+		self.contour_matching(show_results=False, template_flag="destinations_template")
+
+		# Find Square Buttons
+		self.template_filepath = "interface_assets/steris/home_page_templates/mute.jpg"
+		self.contour_matching(show_results=False, template_flag="bottom_buttons_template")
+
+		# Find Rectangular Bottom Buttons
+		self.template_filepath = "interface_assets/steris/home_page_templates/begin_case.jpg"
+		self.contour_matching(show_results=False, template_flag="bottom_buttons_template")
+
+		end_time = time.time()
+
+		print("Elapsed Time - Full Scan: {}".format(end_time - start_time))
 
 	def template_matching(self):
 		"""
@@ -216,7 +273,7 @@ class UIReader:
 
 		# Run template matching over entire dataset of assets
 		start_time = time.time()
-		image_dir = "interface_assets/steris/home_page/"  # TO DO: Temp make this dynamic
+		image_dir = "interface_assets/steris/home_page_templates/"  # TO DO: Temp make this dynamic
 		interface_img = cv.imread(self.source_filepath)  # TO DO: Put this file somewhere else in the future.
 		result = interface_img.copy()
 
@@ -277,13 +334,12 @@ def main():
 					help="Source image where mapping will be performed.")
 	ap.add_argument("--template", nargs='?', default="vitals_camera.jpg",
 					help="Template that will be searched in source image.", type=str)
-	ap.add_argument("--steps", nargs='?', default=0, type=bool, help="Display image transformations on screen.")
+	ap.add_argument("--show", nargs='?', default=0, type=bool, help="Display image transformations on screen.")
 	args = vars(ap.parse_args())
 
 	viewer = UIReader()
-	viewer.source_filepath = args["source"]
-	viewer.template_filepath = args["template"]
-	viewer.select_mapping_method(args["map_method"], args["steps"])
+	viewer.source_filepath = "interface_assets/steris/home_page_templates/home_page_root.jpg"
+	viewer.map_interface()
 	viewer.gui_map.get_map()
 
 
