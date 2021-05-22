@@ -11,6 +11,7 @@
 # =================================================================================================================
 
 from events import EventHandler
+from playsound import playsound
 
 """
 Driver Program
@@ -18,11 +19,9 @@ Driver Program
 
 
 def main():
-    event_manager = EventHandler()
-    event_manager.listen()
+	event_manager = EventHandler()
+	event_manager.listen()
 
 
 if __name__ == "__main__":
-    main()
-
-
+	main()

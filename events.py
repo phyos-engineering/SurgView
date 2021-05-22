@@ -35,14 +35,23 @@ class EventHandler:
 				playsound("prompt.mp3")
 				self.process_intent(self.speech_engine.recognize_intent())
 
-	def process_intent(self, intent_result: json):
+	def process_intent(self, luis_ai_response: json):
+
+		intent_result = luis_ai_response
+		print(intent_result)
 		intent_score = intent_result["topScoringIntent"]["score"]
 		if intent_score >= self.intent_accuracy_threshold:
 			intent = intent_result["topScoringIntent"]["intent"]
 
 			if intent == "ScanInterface":
-				self.interface_reader.capture_feed()
-				self.interface_reader.map_interface()
+				# self.interface_reader.capture_feed()
+				# self.interface_reader.map_interface()
+				print("ScanInterface Called")
+			if intent == "SendSourceToDestination":
+				entities = intent_result["entities"]
+				# first check for existence of source and destination entities
+			
+				print("SendSourceDestinationCalled")
 
 		return
 
