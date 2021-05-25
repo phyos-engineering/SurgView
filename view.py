@@ -380,7 +380,8 @@ def main():
     ap.add_argument("--template", nargs='?', default="interface_assets/steris/home_page_templates/vitals_camera.jpg",
                     help="Template that will be searched in source image.",
                     type=str)
-    ap.add_argument("--show", nargs='?', default=0, type=bool, help="Display image transformations on screen.")
+    ap.add_argument("--show", nargs='?', default=0, type=int, choices=[0, 1],
+                    help="Display image transformations on screen.")
     args = vars(ap.parse_args())
 
     viewer = UIReader()
