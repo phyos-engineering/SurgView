@@ -47,7 +47,7 @@ pip3 install pytest
 pip3 install playsound
 ```
 
-## Installation
+## Installation (Installs All Depedencies Listed)
 
 ```
 chmod +x install_dependencies.sh
