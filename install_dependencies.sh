@@ -7,6 +7,7 @@ pip3 install -U PyObjC
 pip3 install azure-cognitiveservices-speech
 pip3 install pytest
 pip3 install playsound
+pip3 install pybind11
 
 sudo apt-get -y install python3-gi-cairo
 sudo apt-get -y install tesseract-ocr
