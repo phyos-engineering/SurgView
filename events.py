@@ -14,17 +14,20 @@ from controller import SerialController
 from playsound import playsound
 import utils
 import json
+import time
 
 
 class EventHandler:
     def __init__(self):
         """
-        Constructor. Initializes SpeechEngine, UIReader and SerialController Classes
+        Constructor. Initializes SpeechEngine, UIReader and SerialController 
+        Classes
         """
         self.speech_engine = SpeechEngine()
         self.interface_reader = UIReader()
         # self.serial_controller = SerialController()
-        self.intent_accuracy_threshold = 0.50  # TO DO: I'm not completely confident with this value
+        self.intent_accuracy_threshold = 0.50  # TO DO: I'm not completely 
+        # confident with this value
         self.intent_state = None  # TO DO: Think of a better name?
         self.source = []  # TO DO:  Think of a better name?
         self.destinations = []
@@ -32,17 +35,23 @@ class EventHandler:
 
     def listen(self):
         """
-        Listen for activation word and prompt user with sound to give voice command.
+        Listen for activation word and prompt user with sound to give voice 
+        command.
         """
         keep_listening = True
         while keep_listening:
+            print("Device Listening...")
+            time.sleep(3)
+            """
             if self.speech_engine.detect_activation_word():
                 playsound("prompt.mp3")
                 self.process_intent(self.speech_engine.recognize_intent())
+            """
 
     def process_intent(self, luis_ai_response: json):
         """
-        Process intent returned by LUIS.ai after voice command was given at prompt.
+        Process intent returned by LUIS.ai after voice command was given at 
+        prompt.
         :param luis_ai_response: JSON file containing
         """
 
@@ -88,14 +97,17 @@ class EventHandler:
         for entity in entities:
             if entity['type'] == 'source':
                 source_label = utils.clean_string(entity['entity'])
-                button = self.interface_reader.gui_map.locate_label(source_label)
+
+                button = self.interface_reader.gui_map.locate_label(
+                    source_label)
 
                 if button is not None:
                     self.source.append(button)
 
             if entity['type'] == 'destination':
                 destination_label = utils.clean_string(entity['entity'])
-                button = self.interface_reader.gui_map.locate_label(destination_label)
+                button = self.interface_reader.gui_map.locate_label(
+                    destination_label)
 
                 if button is not None:
                     self.destinations.append(button)
