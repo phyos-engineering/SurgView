@@ -8,10 +8,11 @@
 # python_version  :3.7.10
 # conda_version   :4.9.2
 # ====================================================================================================================
-from speech import SpeechEngine
+# from speech import SpeechEngine
 from view import UIReader
 from controller import SerialController
 from playsound import playsound
+import azure_speech
 import utils
 import json
 import time
@@ -23,7 +24,7 @@ class EventHandler:
         Constructor. Initializes SpeechEngine, UIReader and SerialController 
         Classes
         """
-        self.speech_engine = SpeechEngine()
+        self.speech_engine = azure_speech.SpeechEngine()
         self.interface_reader = UIReader()
         # self.serial_controller = SerialController()
         self.intent_accuracy_threshold = 0.50  # TO DO: I'm not completely 
