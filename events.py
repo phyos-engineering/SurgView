@@ -45,7 +45,8 @@ class EventHandler:
             if self.speech_engine.recognize_keyword():
                 playsound("prompt.mp3")
                 response = self.speech_engine.recognize_intent()
-                self.process_intent(json.loads(response))
+                json_payload = json.loads(response)
+                self.process_intent(json_payload)
 
     def process_intent(self, luis_ai_response: json):
         """
@@ -73,7 +74,7 @@ class EventHandler:
         self.interface_reader.gui_map.add_widget("4ksurgicaldisplay1", 1, 2)
         self.interface_reader.gui_map.add_widget("vitals", 3, 4)
 
-    def map_interface(self):
+    def scan_interface(self):
         print("Mapping Interface...")
         self.interface_reader.query_frame()
         self.interface_reader.map_interface()
@@ -129,7 +130,7 @@ class EventHandler:
         :param intent: LUIS.ai intent
         :return: method that should be executed by process_intent()
         """
-        switch = {"MapInterface": self.map_interface,
+        switch = {"MapInterface": self.scan_interface,
                   "SourceToDestination": self.source_to_destination,
                   "SelectButton": self.select_button}
 

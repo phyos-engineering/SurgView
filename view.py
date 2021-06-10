@@ -329,9 +329,8 @@ class UIReader:
         # Find Main Window
         print("FINDING MAIN WINDOW")
         self.template_filepath = "interface_assets/steris/home_page_templates/main_window.jpg"
-
-        stuff = self.contour_matching(show_results=show_flag, template_flag="main_window_template")
-
+        self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
+                                                                 template_flag="main_window_template"))
         # Find Sources
         print("FINDING SOURCES")
         self.template_filepath = "interface_assets/steris/home_page_templates/vitals_camera.jpg"
