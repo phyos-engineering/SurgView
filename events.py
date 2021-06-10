@@ -45,10 +45,7 @@ class EventHandler:
             if self.speech_engine.recognize_keyword():
                 playsound("prompt.mp3")
                 response = self.speech_engine.recognize_intent()
-                try:
-                    self.process_intent(json.loads(response))
-                except:
-                    print(response)
+                self.process_intent(json.loads(response))
 
     def process_intent(self, luis_ai_response: json):
         """
