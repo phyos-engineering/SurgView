@@ -46,6 +46,9 @@ class UIReader:
         self.video_feed = cv.VideoCapture(0)
         self.video_feed.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
         self.video_feed.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+        print("Booting Up...")
+        time.sleep(3)
+        print("Booting Complete")
 
     def query_frame(self):
         """
@@ -53,6 +56,7 @@ class UIReader:
         """
         if not self.video_feed.isOpened():
             print("Cannot open camera")
+            exit()
 
         self.video_feed.grab()
         ret, frame = self.video_feed.retrieve()
