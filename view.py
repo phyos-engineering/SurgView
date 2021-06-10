@@ -238,9 +238,7 @@ class UIReader:
 
         # Load Interface Image & Make Copy:
 
-        interface = cv.imread(
-            self.source_filepath
-        )  # -> Switch out for current_view once everything is ready
+        interface = self.current_view  # cv.imread(self.source_filepath)  # -> Switch out for current_view once everything is ready
         interface_contours = interface.copy()
         interface_result = interface.copy()
 
