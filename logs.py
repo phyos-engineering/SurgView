@@ -22,4 +22,4 @@ class SessionLogger:
 
     def record_picture(self, image):
         curr_time = datetime.datetime.now()
-        cv.imwrite(self.log_path + str(curr_time.strftime("%H_%M_%S")) + ".png", image)
+        cv.imwrite(self.log_path + "/" + str(curr_time.strftime("%H_%M_%S")) + ".png", image)
