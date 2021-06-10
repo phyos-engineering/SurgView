@@ -63,6 +63,7 @@ class UIReader:
 
         self.current_view = frame
         self.session_logger.record_picture(frame)
+        time.sleep(1)
 
     def record_session(self):  # This has to run on a separate thread
         fourcc = cv.VideoWriter_fourcc(*'XVID')

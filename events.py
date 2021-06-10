@@ -41,7 +41,7 @@ class EventHandler:
         """
         keep_listening = True
         while keep_listening:
-            print("Listing for Activation Word...")
+            print("Listening for Activation Word...")
             if self.speech_engine.recognize_keyword():
                 playsound("prompt.mp3")
                 response = self.speech_engine.recognize_intent()
