@@ -20,8 +20,8 @@ using namespace Microsoft::CognitiveServices::Speech::Intent;
  * 
  * # Calling Class Methods: 
  *
- * boolean_value = mic.recognize_intent() -> bool
- * azure_result = mic.recognize_keyword() -> string
+ * boolean_value = mic.recognize_keyword() -> bool
+ * azure_result = mic.recognize_intent() -> string
  *
  * #########################################
  *

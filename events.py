@@ -26,7 +26,7 @@ class EventHandler:
         """
         self.speech_engine = azure_speech.SpeechEngine()
         self.interface_reader = UIReader()
-        # self.serial_controller = SerialController()
+        self.serial_controller = SerialController()
         self.intent_accuracy_threshold = 0.50  # TO DO: I'm not completely 
         # confident with this value
         self.intent_state = None  # TO DO: Think of a better name?
@@ -41,13 +41,14 @@ class EventHandler:
         """
         keep_listening = True
         while keep_listening:
-            print("Device Listening...")
-            time.sleep(3)
-            """
-            if self.speech_engine.detect_activation_word():
+            print("Listing for Activation Word...")
+            if self.speech_engine.recognize_keyword():
                 playsound("prompt.mp3")
-                self.process_intent(self.speech_engine.recognize_intent())
-            """
+                response = self.speech_engine.recognize_intent()
+                try:
+                    self.process_intent(json.loads(response))
+                except:
+                    print(response)
 
     def process_intent(self, luis_ai_response: json):
         """
@@ -92,7 +93,7 @@ class EventHandler:
         """
         entities = self.intent_state["entities"]
 
-        self.add_dummy_values()  # Testing
+        # self.add_dummy_values()  # Testing
 
         # First check for existence of a source and destination
         for entity in entities:
@@ -142,7 +143,7 @@ class EventHandler:
         self.build_workflow()
         if flag == 0:
             for i in self.workflow:
-                print("Moving Mouse: {} {}".format(i[1]["x"], i[1]["y"]))
-                # self.serial_controller.move_mouse(i[1]["x"], i[1]["y"])
+                # print("Moving Mouse: {} {}".format(i[1]["x"], i[1]["y"]))
+                self.serial_controller.move_mouse(i[1]["x"], i[1]["y"])
         if flag == 1:
-            self.serial_controller.type_with_keyboard()
+            self.serial_controller.type_with_keyboard("Hello World!")
