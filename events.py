@@ -78,7 +78,7 @@ class EventHandler:
 
     def map_interface(self):
         print("Mapping Interface...")
-        self.interface_reader.capture_feed()
+        self.interface_reader.query_frame()
         self.interface_reader.map_interface()
 
     def build_workflow(self):

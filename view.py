@@ -19,6 +19,9 @@ import argparse
 import imutils
 import utils
 import re
+from logs import SessionLogger
+import logging
+
 """
 The UIReader maps out the screen locations of interface widgets using OpenCV.
 """
@@ -32,39 +35,36 @@ class UIReader:
         self.program_name = None  # To Do: Exception Handling
         self.page_name = None  # To Do: Exception Handling
         self.assets_directory = "/interface_assets/"  # Directory location of templates.
-        self.gui_map = ScreenMap(
-        )  # Class in charge of tracking widgets identified by UIReader.
-        self.capture_feed = None  # Device (USB Capture Card) outputting video feed of program.
+        self.gui_map = ScreenMap()  # Class in charge of tracking widgets identified by UIReader.
+        self.session_logger = SessionLogger()
         self.source_filepath = None
         self.template_filepath = None
         self.current_view = None
-
-    def config_video_stream(self):
-        self.capture_feed = cv.VideoCapture(0)
-        self.capture_feed.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
-        self.capture_feed.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+        logging.basicConfig(filename=self.session_logger.log_path + ".log", level=logging.DEBUG)
+        # Config Video
+        self.video_feed = cv.VideoCapture(0)
+        self.video_feed.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+        self.video_feed.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
 
     def query_frame(self):
         """
         Read one frame from the video feed (USB Capture Card) and write to file
         """
-        if not self.capture_feed.isOpened():
+        if not self.video_feed.isOpened():
             print("Cannot open camera")
 
-        self.capture_feed.grab()
-        ret, frame = self.capture_feed.retrieve()
-        cv.imshow("test?", frame)
-        cv.waitKey(0)
+        self.video_feed.grab()
+        ret, frame = self.video_feed.retrieve()
 
         self.current_view = frame
-        cv.imwrite("current_view.png", frame)
+        self.session_logger.record_picture(frame)
 
     def record_session(self):  # This has to run on a separate thread
         fourcc = cv.VideoWriter_fourcc(*'XVID')
         out = cv.VideoWriter('test.avi', fourcc, 15.0, (1920, 1080))
 
-        while self.capture_feed.isOpened():
-            ret, frame = self.capture_feed.read()
+        while self.video_feed.isOpened():
+            ret, frame = self.video_feed.read()
             if not ret:
                 print("Can't receive frame (stream end?). Exiting ...")
                 break
@@ -72,7 +72,7 @@ class UIReader:
             out.write(frame)
 
         # Release everything if job is finished
-        self.capture_feed.release()
+        self.video_feed.release()
         out.release()
         cv.destroyAllWindows()
 
@@ -84,13 +84,13 @@ class UIReader:
         Test video feed.
         """
 
-        if not self.capture_feed.isOpened():
+        if not self.video_feed.isOpened():
             print("Cannot open camera")
             exit()
 
         while True:
 
-            ret, frame = self.capture_feed.read()
+            ret, frame = self.video_feed.read()
             if not ret:
                 break
 
@@ -98,7 +98,7 @@ class UIReader:
                 break
             cv.imshow('Frame', frame)
 
-        self.capture_feed.release()
+        self.video_feed.release()
         cv.destroyAllWindows()
 
     def extract_text(self, extracted_image,
@@ -154,6 +154,9 @@ class UIReader:
 
         elapsed_time = end_time - start_time
         print("Extracting Text: {} - Elapsed Time: {}s".format(
+            cleaned_text, round(elapsed_time, 2)))
+
+        logging.debug("Extracting Text: {} - Elapsed Time: {}s".format(
             cleaned_text, round(elapsed_time, 2)))
         return cleaned_text
 
@@ -313,38 +316,40 @@ class UIReader:
         print("Contour Matching - Elapsed Time: {}s".format(
             round(elapsed_time, 2)))
 
+        return rects_result
+
     def map_interface(self, show_flag=False):
         start_time = time.time()
 
         # Find Main Window
         print("FINDING MAIN WINDOW")
         self.template_filepath = "interface_assets/steris/home_page_templates/main_window.jpg"
-        self.contour_matching(show_results=show_flag,
-                              template_flag="main_window_template")
+        self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
+                                                                 template_flag="main_window_template"))
 
         # Find Sources
         print("FINDING SOURCES")
         self.template_filepath = "interface_assets/steris/home_page_templates/vitals_camera.jpg"
-        self.contour_matching(show_results=show_flag,
-                              template_flag="sources_template")
+        self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
+                                                                 template_flag="sources_template"))
 
         # Find Destinations
         print("FINDING DESTINATIONS")
         self.template_filepath = "interface_assets/steris/home_page_templates/surgical_display_1.jpg"
-        self.contour_matching(show_results=show_flag,
-                              template_flag="destinations_template")
+        self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
+                                                                 template_flag="destinations_template"))
 
         # Find Square Buttons
         print("FINDING SQUARE BUTTONS")
         self.template_filepath = "interface_assets/steris/home_page_templates/mute.jpg"
-        self.contour_matching(show_results=show_flag,
-                              template_flag="bottom_buttons_template")
+        self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
+                                                                 template_flag="bottom_buttons_template"))
 
         # Find Rectangular Bottom Buttons
         print("FINDING RECT BUTTONS")
         self.template_filepath = "interface_assets/steris/home_page_templates/begin_case.jpg"
-        self.contour_matching(show_results=show_flag,
-                              template_flag="bottom_buttons_template")
+        self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
+                                                                 template_flag="bottom_buttons_template"))
 
         end_time = time.time()
 
