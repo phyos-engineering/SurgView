@@ -40,7 +40,7 @@ class UIReader:
         self.source_filepath = None
         self.template_filepath = None
         self.current_view = None
-        logging.basicConfig(filename=self.session_logger.log_path + "/" + self.session_logger.log_path + ".log",
+        logging.basicConfig(filename=self.session_logger.log_path + "/session.log",
                             level=logging.DEBUG)
         # Config Video
         self.video_feed = cv.VideoCapture(0)
