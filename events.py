@@ -8,23 +8,27 @@
 # python_version  :3.7.10
 # conda_version   :4.9.2
 # ====================================================================================================================
-from speech import SpeechEngine
+# from speech import SpeechEngine
 from view import UIReader
 from controller import SerialController
 from playsound import playsound
+import azure_speech
 import utils
 import json
+import time
 
 
 class EventHandler:
     def __init__(self):
         """
-        Constructor. Initializes SpeechEngine, UIReader and SerialController Classes
+        Constructor. Initializes SpeechEngine, UIReader and SerialController 
+        Classes
         """
-        self.speech_engine = SpeechEngine()
+        self.speech_engine = azure_speech.SpeechEngine()
         self.interface_reader = UIReader()
-        # self.serial_controller = SerialController()
-        self.intent_accuracy_threshold = 0.50  # TO DO: I'm not completely confident with this value
+        self.serial_controller = SerialController()
+        self.intent_accuracy_threshold = 0.50  # TO DO: I'm not completely 
+        # confident with this value
         self.intent_state = None  # TO DO: Think of a better name?
         self.source = []  # TO DO:  Think of a better name?
         self.destinations = []
@@ -32,17 +36,22 @@ class EventHandler:
 
     def listen(self):
         """
-        Listen for activation word and prompt user with sound to give voice command.
+        Listen for activation word and prompt user with sound to give voice 
+        command.
         """
         keep_listening = True
         while keep_listening:
-            if self.speech_engine.detect_activation_word():
+            print("Listening for Activation Word...")
+            if self.speech_engine.recognize_keyword():
                 playsound("prompt.mp3")
-                self.process_intent(self.speech_engine.recognize_intent())
+                response = self.speech_engine.recognize_intent()
+                json_payload = json.loads(response)
+                self.process_intent(json_payload)
 
     def process_intent(self, luis_ai_response: json):
         """
-        Process intent returned by LUIS.ai after voice command was given at prompt.
+        Process intent returned by LUIS.ai after voice command was given at 
+        prompt.
         :param luis_ai_response: JSON file containing
         """
 
@@ -65,9 +74,9 @@ class EventHandler:
         self.interface_reader.gui_map.add_widget("4ksurgicaldisplay1", 1, 2)
         self.interface_reader.gui_map.add_widget("vitals", 3, 4)
 
-    def map_interface(self):
+    def scan_interface(self):
         print("Mapping Interface...")
-        self.interface_reader.capture_feed()
+        self.interface_reader.query_frame()
         self.interface_reader.map_interface()
 
     def build_workflow(self):
@@ -82,20 +91,23 @@ class EventHandler:
         """
         entities = self.intent_state["entities"]
 
-        self.add_dummy_values()  # Testing
+        # self.add_dummy_values()  # Testing
 
         # First check for existence of a source and destination
         for entity in entities:
             if entity['type'] == 'source':
                 source_label = utils.clean_string(entity['entity'])
-                button = self.interface_reader.gui_map.locate_label(source_label)
+
+                button = self.interface_reader.gui_map.locate_label(
+                    source_label)
 
                 if button is not None:
                     self.source.append(button)
 
             if entity['type'] == 'destination':
                 destination_label = utils.clean_string(entity['entity'])
-                button = self.interface_reader.gui_map.locate_label(destination_label)
+                button = self.interface_reader.gui_map.locate_label(
+                    destination_label)
 
                 if button is not None:
                     self.destinations.append(button)
@@ -118,7 +130,7 @@ class EventHandler:
         :param intent: LUIS.ai intent
         :return: method that should be executed by process_intent()
         """
-        switch = {"MapInterface": self.map_interface,
+        switch = {"MapInterface": self.scan_interface,
                   "SourceToDestination": self.source_to_destination,
                   "SelectButton": self.select_button}
 
@@ -129,7 +141,7 @@ class EventHandler:
         self.build_workflow()
         if flag == 0:
             for i in self.workflow:
-                print("Moving Mouse: {} {}".format(i[1]["x"], i[1]["y"]))
-                # self.serial_controller.move_mouse(i[1]["x"], i[1]["y"])
+                # print("Moving Mouse: {} {}".format(i[1]["x"], i[1]["y"]))
+                self.serial_controller.move_mouse(i[1]["x"], i[1]["y"])
         if flag == 1:
-            self.serial_controller.type_with_keyboard()
+            self.serial_controller.type_with_keyboard("Hello World!")

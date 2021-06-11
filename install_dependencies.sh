@@ -4,7 +4,7 @@ pip3 install numpy --upgrade
 pip3 install imutils
 pip3 install pyserial
 pip3 install -U PyObjC
-pip3 install azure-cognitiveservices-speech
+#pip3 install azure-cognitiveservices-speech
 pip3 install pytest
 pip3 install playsound
 pip3 install pybind11
