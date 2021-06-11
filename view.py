@@ -52,7 +52,7 @@ class UIReader:
 
     def query_frame(self):
         """
-        Read one frame from the video feed (USB Capture Card) and write to file
+        Read one frame from the video feed (USB Capture Card) and update current_frame.
         """
         if not self.video_feed.isOpened():
             print("Cannot open camera")
