@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a1f4c686-20e0-46f2-9a1c-20858bc19d46" name="Default Changelist" comment="" />
+    <list default="true" id="a1f4c686-20e0-46f2-9a1c-20858bc19d46" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/test_mapping.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Unit Test" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -27,6 +37,98 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
+  <component name="RunManager" selected="Python tests.pytest for test_mapping.TestMapping">
+    <configuration name="mapping" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="SurgView" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/mapping.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_calculator.TestCalculator" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="SurgView" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_calculator.TestCalculator&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_mapping.TestMapping" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="SurgView" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_mapping.TestMapping&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_mapping.TestMapping.test_add_coordinate" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="SurgView" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_mapping.TestMapping.test_add_coordinate&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_mapping.TestMapping.test_addition" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="SurgView" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_mapping.TestMapping.test_addition&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python tests.pytest for test_mapping.TestMapping" />
+        <item itemvalue="Python tests.pytest for test_mapping.TestMapping.test_add_coordinate" />
+        <item itemvalue="Python tests.pytest for test_mapping.TestMapping.test_addition" />
+        <item itemvalue="Python tests.pytest for test_calculator.TestCalculator" />
+        <item itemvalue="Python.mapping" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -41,10 +143,34 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
+    <state x="570" y="182" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1623792993846">
+      <screen x="0" y="23" width="1440" height="807" />
+    </state>
+    <state x="570" y="182" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1440.807@0.23.1440.807" timestamp="1623792993846" />
+    <state x="526" y="55" key="#mapping" timestamp="1623792064873">
+      <screen x="0" y="23" width="1440" height="807" />
+    </state>
+    <state x="526" y="55" key="#mapping/0.23.1440.807@0.23.1440.807" timestamp="1623792064873" />
     <state x="299" y="239" key="FileChooserDialogImpl" timestamp="1622132356648">
       <screen x="0" y="23" width="1440" height="807" />
     </state>
     <state x="299" y="239" key="FileChooserDialogImpl/0.23.1440.807@0.23.1440.807" timestamp="1622132356648" />
+    <state width="1194" height="207" key="GridCell.Tab.0.bottom" timestamp="1623792993892">
+      <screen x="0" y="23" width="1440" height="807" />
+    </state>
+    <state width="1194" height="207" key="GridCell.Tab.0.bottom/0.23.1440.807@0.23.1440.807" timestamp="1623792993892" />
+    <state width="1194" height="207" key="GridCell.Tab.0.center" timestamp="1623792993889">
+      <screen x="0" y="23" width="1440" height="807" />
+    </state>
+    <state width="1194" height="207" key="GridCell.Tab.0.center/0.23.1440.807@0.23.1440.807" timestamp="1623792993889" />
+    <state width="1194" height="207" key="GridCell.Tab.0.left" timestamp="1623792993888">
+      <screen x="0" y="23" width="1440" height="807" />
+    </state>
+    <state width="1194" height="207" key="GridCell.Tab.0.left/0.23.1440.807@0.23.1440.807" timestamp="1623792993888" />
+    <state width="1194" height="207" key="GridCell.Tab.0.right" timestamp="1623792993891">
+      <screen x="0" y="23" width="1440" height="807" />
+    </state>
+    <state width="1194" height="207" key="GridCell.Tab.0.right/0.23.1440.807@0.23.1440.807" timestamp="1623792993891" />
     <state x="431" y="107" key="SettingsEditor" timestamp="1622132384176">
       <screen x="0" y="23" width="1440" height="807" />
     </state>
