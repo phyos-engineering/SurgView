@@ -25,12 +25,12 @@ class TestMapping:
         mapper.remove_widget("test")
         assert mapper.gui_map == {}
 
-    def test_add_invalid_coordinate(self):
-        mapper = mapping.ScreenMap()
-        print("Adding Coordinate:")
-        mapper.add_widget(1, 1, 2)
-        assert mapper.gui_map == {1: {'x': 1, 'y': 2}}
-        assert mapper.locate_label(1) == {1: {'x': 1, 'y': 2}}
+    #def test_add_invalid_coordinate(self):
+        # mapper = mapping.ScreenMap()
+        # print("Adding Coordinate:")
+        # mapper.add_widget(1, 1, 2)
+        # assert mapper.gui_map == {1: {'x': 1, 'y': 2}}
+        # assert mapper.locate_label(1) == {1: {'x': 1, 'y': 2}}
 
     def test_key_exists(self):
         mapper = mapping.ScreenMap()
