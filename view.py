@@ -43,7 +43,7 @@ class UIReader:
         logging.basicConfig(filename=self.session_logger.log_path + "/session.log",
                             level=logging.DEBUG)
         # Config Video
-        self.video_feed = cv.VideoCapture(0)
+        self.video_feed = cv.VideoCapture(1)
         self.video_feed.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
         self.video_feed.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
         print("Booting Up...")
