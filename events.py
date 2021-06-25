@@ -15,6 +15,8 @@ from playsound import playsound
 import azure_speech
 import utils
 import json
+import platform
+import multiprocessing
 import time
 
 
@@ -33,6 +35,20 @@ class EventHandler:
         self.source = []  # TO DO:  Think of a better name?
         self.destinations = []
         self.workflow = []
+
+        # OS System Info
+        self.system_name = platform.system()
+        self.system_release = platform.release()
+        self.system_version = platform.version()
+
+        # Hardware Info
+        self.device_serial_number = utils.get_serial_number()
+        self.device_processor = platform.processor()
+        self.num_cores = multiprocessing.cpu_count()
+        self.board_model = utils.get_board_model()
+
+        # Device Status
+        self.is_online = True
 
     def listen(self):
         """
@@ -124,6 +140,9 @@ class EventHandler:
     def select_button(self):
         print("Selecting Button...")
 
+    def shutdown(self):
+        exit(0)
+
     def match_case(self, intent: str):
         """
         Switch statement in Python via dictionaries
@@ -132,7 +151,8 @@ class EventHandler:
         """
         switch = {"MapInterface": self.scan_interface,
                   "SourceToDestination": self.source_to_destination,
-                  "SelectButton": self.select_button}
+                  "SelectButton": self.select_button,
+                  "Shutdown": self.shutdown()}
 
         command_function = switch.get(intent, lambda: self.default_response)
         return command_function
