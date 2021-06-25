@@ -13,7 +13,7 @@ class TestMapping:
         mapper.add_widget("test", 1, 2)
         assert mapper.gui_map == {'test': {'x': 1, 'y': 2}}
         assert mapper.get_map != {'test': {'x': 1, 'y': 2}}
-        #get map returns the address of a map object, which may not be what you want
+        # get map returns the address of a map object, which may not be what you want
         mapper.add_widget("best", 1, 2)
         assert mapper.gui_map == {'best': {'x': 1, 'y': 2}, 'test': {'x': 1, 'y': 2}}
         assert mapper.locate_label("test") == ('test', {'x': 1, 'y': 2})
@@ -21,29 +21,22 @@ class TestMapping:
         assert mapper.locate_label("test") != ('best', {'x': 1, 'y': 2})
         mapper.remove_widget("best")
         assert mapper.gui_map == {'test': {'x': 1, 'y': 2}}
-        assert mapper.locate_label("best") == None
+        assert mapper.locate_label("best") is None
         mapper.remove_widget("test")
         assert mapper.gui_map == {}
-
-    #def test_add_invalid_coordinate(self):
-        # mapper = mapping.ScreenMap()
-        # print("Adding Coordinate:")
-        # mapper.add_widget(1, 1, 2)
-        # assert mapper.gui_map == {1: {'x': 1, 'y': 2}}
-        # assert mapper.locate_label(1) == {1: {'x': 1, 'y': 2}}
 
     def test_key_exists(self):
         mapper = mapping.ScreenMap()
         print("Checking if Key -> test exists:")
-        assert mapper.if_widget_exists("test") == False
+        assert mapper.if_widget_exists("test") is False
         print("Adding Coordinate:")
         mapper.add_widget("best", 1, 2)
         print("Checking if Key -> test exists:")
-        assert mapper.if_widget_exists("test") == False
+        assert mapper.if_widget_exists("test") is False
         print("Adding Coordinate:")
         mapper.add_widget("test", 1, 2)
         print("Checking if Key -> test exists:")
-        assert mapper.if_widget_exists("test") == True
+        assert mapper.if_widget_exists("test") is True
 
     def test_update_coordinate(self):
         mapper = mapping.ScreenMap()
@@ -52,4 +45,3 @@ class TestMapping:
         print("Updating Values of Key-> test:")
         mapper.update_coordinate("test", -3, -4)
         assert mapper.gui_map == {'test': {'x': -3, 'y': -4}}
-
