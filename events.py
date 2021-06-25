@@ -38,14 +38,21 @@ class EventHandler:
 
         # OS System Info
         self.system_name = platform.system()
+        print(self.system_name)
         self.system_release = platform.release()
+        print(self.system_release)
         self.system_version = platform.version()
+        print(self.system_version)
 
         # Hardware Info
         self.device_serial_number = utils.get_serial_number()
+        print(self.device_serial_number)
         self.device_processor = platform.processor()
+        print(self.device_processor)
         self.num_cores = multiprocessing.cpu_count()
+        print(self.num_cores)
         self.board_model = utils.get_board_model()
+        print(self.board_model)
 
         # Device Status
         self.is_online = True
