@@ -26,7 +26,6 @@ def get_serial_number():
         for line in f:
             if line[0:6] == "Serial":
                 cpu_serial = line[10:26]
-                f.close()
     except:
         cpu_serial = "ERROR000000000"
 
@@ -39,7 +38,6 @@ def get_board_model():
         f = open("/proc/device-tree/model", 'r')
         for line in f:
             board_model = line[::]
-            f.close()
     except:
         board_model = "ERROR"
     return board_model
