@@ -22,9 +22,9 @@ def clean_string(string: str) -> str:
 def get_serial_number():
     cpu_serial = "0000000000000000"
     try:
-        f = open('/proc/cpuinfo', 'r')
+        f = open("/proc/cpuinfo", 'r')
         for line in f:
-            if line[0:6] == 'Serial':
+            if line[0:6] == "Serial":
                 cpu_serial = line[10:26]
                 f.close()
     except:
@@ -36,7 +36,7 @@ def get_serial_number():
 def get_board_model():
     board_model = ""
     try:
-        f = open('/proc/device-tree/model ', 'r')
+        f = open("/proc/device-tree/model", 'r')
         for line in f:
             board_model = line[::]
             f.close()
