@@ -41,7 +41,7 @@ def get_board_model():
             board_model = line[::]
             f.close()
     except:
-        print("ERROR")
+        board_model = "ERROR"
     return board_model
 
 
