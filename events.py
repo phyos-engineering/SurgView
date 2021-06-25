@@ -17,6 +17,8 @@ import utils
 import json
 import platform
 import multiprocessing
+import requests
+import json
 import time
 
 
@@ -57,6 +59,8 @@ class EventHandler:
         # Device Status
         self.is_online = True
 
+        print(self.register_device())
+
     def listen(self):
         """
         Listen for activation word and prompt user with sound to give voice 
@@ -70,6 +74,27 @@ class EventHandler:
                 response = self.speech_engine.recognize_intent()
                 json_payload = json.loads(response)
                 self.process_intent(json_payload)
+
+    def register_device(self):
+        url = "http://192.168.0.152:8000/api/device"
+        headers = {'Content-Type': 'application/json', 'Accept': 'json'}
+        obj = {
+            "serialNumber": self.device_serial_number,
+            "boardModel": self.board_model,
+            "processorName": self.processor_name,
+            "processorCores": self.processor_cores,
+            "deviceMemory": self.device_memory,
+            "systemName": self.system_name,
+            "systemRelease": self.system_release,
+            "systemVersion": self.system_version,
+            "pythonVersion": self.python_version,
+            "pythonCompiler": self.python_compiler,
+            "pythonImplementation": self.python_impl,
+            "applicationVersion": self.application_version,
+            "online": self.is_online
+        }
+        result = requests.post(url, data=json.dumps(obj), headers=headers)
+        return result.headers
 
     def process_intent(self, luis_ai_response: json):
         """
