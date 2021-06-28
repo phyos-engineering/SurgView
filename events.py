@@ -59,7 +59,7 @@ class EventHandler:
         # Device Status
         self.is_online = True
 
-        print(self.register_device())
+        #print(self.register_device())
 
     def listen(self):
         """
