@@ -21,6 +21,8 @@ import requests
 import json
 import time
 import logging
+import os
+from fnmatch import fnmatch
 
 
 class EventHandler:
@@ -60,9 +62,10 @@ class EventHandler:
         # Device Status
         self.is_online = True
 
-        #print(self.register_device())
-        #self.register_device()
-        #self.check_if_registered()
+        print(self.interface_reader.session_logger.log_path)
+        print(self.interface_reader.session_logger.session_id)
+        print(self.interface_reader.session_logger.session_date)
+        self.check_if_registered()
 
     def listen(self):
         """
@@ -198,9 +201,47 @@ class EventHandler:
         result = requests.patch(url, data=json.dumps(obj), headers=headers)
         logging.debug(result.headers)
 
+    def add_session_id(self):
+        url = "http://192.168.0.152:8000/api/device/add_session"
+        params = {
+            "serialNumber": self.device_serial_number,
+            "sessionId": self.interface_reader.session_logger.session_id
+        }
+        result = requests.patch(url, params=params)
+        logging.debug(result.headers)
+
+    def send_log(self):
+        params = {
+            "serialNumber": self.device_serial_number,
+            "sessionId": self.interface_reader.session_logger.session_id
+        }
+        log_dir = os.listdir(self.interface_reader.session_logger.log_path)
+        for filename in log_dir:
+            if fnmatch(filename, '*.png'):
+                image = open(
+                    self.interface_reader.session_logger.log_path + "/" +
+                    filename, "rb")
+                url = "http://192.168.0.152:8300/api/images"
+                result = requests.post(url,
+                                       files={"image": image},
+                                       params=params)
+                logging.debug(result.headers)
+
+            if fnmatch(filename, '*.log'):
+                textFile = open(
+                    self.interface_reader.session_logger.log_path + "/" +
+                    filename, "rb")
+                url = "http://192.168.0.152:8400/api/files"
+                result = requests.post(url,
+                                       files={"textFile": textFile},
+                                       params=params)
+                logging.debug(result.headers)
+
     def shutdown(self):
         print("Shutting Down...")
         self.update_status()
+        self.send_log()
+        self.add_session_id()
         exit(0)
 
     def match_case(self, intent: str):
