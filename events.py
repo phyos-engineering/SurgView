@@ -15,7 +15,12 @@ from playsound import playsound
 import azure_speech
 import utils
 import json
+import platform
+import multiprocessing
+import requests
+import json
 import time
+import logging
 
 
 class EventHandler:
@@ -27,12 +32,37 @@ class EventHandler:
         self.speech_engine = azure_speech.SpeechEngine()
         self.interface_reader = UIReader()
         self.serial_controller = SerialController()
-        self.intent_accuracy_threshold = 0.50  # TO DO: I'm not completely 
+        self.intent_accuracy_threshold = 0.50  # TO DO: I'm not completely
         # confident with this value
         self.intent_state = None  # TO DO: Think of a better name?
         self.source = []  # TO DO:  Think of a better name?
         self.destinations = []
         self.workflow = []
+
+        # OS System Info
+        self.system_name = platform.system()
+        self.system_release = platform.release()
+        self.system_version = platform.version()
+
+        # Hardware Info
+        self.device_serial_number = utils.get_serial_number()
+        self.board_model = utils.get_board_model()
+        self.processor_name = platform.processor()
+        self.processor_cores = multiprocessing.cpu_count()
+        self.device_memory = "4GB"
+
+        # Software Info
+        self.python_version = platform.python_version()
+        self.python_compiler = platform.python_compiler()
+        self.python_impl = platform.python_implementation()
+        self.application_version = "0.01"
+
+        # Device Status
+        self.is_online = True
+
+        #print(self.register_device())
+        #self.register_device()
+        #self.check_if_registered()
 
     def listen(self):
         """
@@ -47,6 +77,34 @@ class EventHandler:
                 response = self.speech_engine.recognize_intent()
                 json_payload = json.loads(response)
                 self.process_intent(json_payload)
+
+    def check_if_registered(self):
+        url = "http://192.168.0.152:8000/api/device/check"
+        payload = {"serialNumber": self.device_serial_number}
+        result = requests.get(url, params=payload)
+        if result.text == "false":
+            self.register_device()
+
+    def register_device(self):
+        url = "http://192.168.0.152:8000/api/device"
+        headers = {'Content-Type': 'application/json', 'Accept': 'json'}
+        obj = {
+            "serialNumber": self.device_serial_number,
+            "boardModel": self.board_model,
+            "processorName": self.processor_name,
+            "processorCores": self.processor_cores,
+            "deviceMemory": self.device_memory,
+            "systemName": self.system_name,
+            "systemRelease": self.system_release,
+            "systemVersion": self.system_version,
+            "pythonVersion": self.python_version,
+            "pythonCompiler": self.python_compiler,
+            "pythonImplementation": self.python_impl,
+            "applicationVersion": self.application_version,
+            "online": self.is_online
+        }
+        result = requests.post(url, data=json.dumps(obj), headers=headers)
+        logging.debug(result.headers)
 
     def process_intent(self, luis_ai_response: json):
         """
@@ -124,15 +182,39 @@ class EventHandler:
     def select_button(self):
         print("Selecting Button...")
 
+    def update_status(self):
+        url = "http://192.168.0.152:8000/api/device/update"
+        headers = {'Content-Type': 'application/json', 'Accept': 'json'}
+        online_status = None
+        if self.is_online:
+            online_status = False
+        else:
+            online_status = True
+
+        obj = {
+            "serialNumber": self.device_serial_number,
+            "online": online_status
+        }
+        result = requests.patch(url, data=json.dumps(obj), headers=headers)
+        logging.debug(result.headers)
+
+    def shutdown(self):
+        print("Shutting Down...")
+        self.update_status()
+        exit(0)
+
     def match_case(self, intent: str):
         """
         Switch statement in Python via dictionaries
         :param intent: LUIS.ai intent
         :return: method that should be executed by process_intent()
         """
-        switch = {"MapInterface": self.scan_interface,
-                  "SourceToDestination": self.source_to_destination,
-                  "SelectButton": self.select_button}
+        switch = {
+            "MapInterface": self.scan_interface,
+            "SourceToDestination": self.source_to_destination,
+            "SelectButton": self.select_button,
+            "Shutdown": self.shutdown
+        }
 
         command_function = switch.get(intent, lambda: self.default_response)
         return command_function

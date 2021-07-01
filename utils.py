@@ -17,3 +17,36 @@ def clean_string(string: str) -> str:
     :return: cleaned string
     """
     return ''.join(c for c in string if c.isalnum()).lower()
+
+
+def get_serial_number():
+    cpu_serial = "0000000000000000"
+    try:
+        f = open("/proc/cpuinfo", 'r')
+        for line in f:
+            if line[0:6] == "Serial":
+                cpu_serial = line[10:26]
+    except:
+        cpu_serial = "ERROR000000000"
+
+    return cpu_serial
+
+
+def get_board_model():
+    board_model = ""
+    try:
+        f = open("/proc/device-tree/model", 'r')
+        for line in f:
+            board_model = line[::]
+    except:
+        board_model = "ERROR"
+    return board_model
+
+
+def main():
+    print(get_serial_number())
+    print(get_board_model())
+
+
+if __name__ == "__main__":
+    main()
