@@ -200,7 +200,7 @@ class EventHandler:
 
     def shutdown(self):
         print("Shutting Down...")
-        self.update_status()
+        #self.update_status()
         exit(0)
 
     def match_case(self, intent: str):
