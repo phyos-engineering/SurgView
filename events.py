@@ -40,6 +40,7 @@ class EventHandler:
         self.source = []  # TO DO:  Think of a better name?
         self.destinations = []
         self.workflow = []
+        self.server_ip = "35.206.81.37"
 
         # OS System Info
         self.system_name = platform.system()
@@ -82,14 +83,14 @@ class EventHandler:
                 self.process_intent(json_payload)
 
     def check_if_registered(self):
-        url = "http://192.168.0.152:8000/api/device/check"
+        url = "http://" + self.server_ip + ":8765/api/device/check"
         payload = {"serialNumber": self.device_serial_number}
         result = requests.get(url, params=payload)
         if result.text == "false":
             self.register_device()
 
     def register_device(self):
-        url = "http://192.168.0.152:8000/api/device"
+        url = "http://" + self.server_ip + ":8765/api/device"
         headers = {'Content-Type': 'application/json', 'Accept': 'json'}
         obj = {
             "serialNumber": self.device_serial_number,
@@ -186,7 +187,7 @@ class EventHandler:
         print("Selecting Button...")
 
     def update_status(self):
-        url = "http://192.168.0.152:8000/api/device/update"
+        url = "http://" + self.server_ip + ":8765/api/device/update"
         headers = {'Content-Type': 'application/json', 'Accept': 'json'}
         online_status = None
         if self.is_online:
@@ -202,7 +203,7 @@ class EventHandler:
         logging.debug(result.headers)
 
     def add_session_id(self):
-        url = "http://192.168.0.152:8000/api/device/add_session"
+        url = "http://" + self.server_ip + ":8765/api/device/add_session"
         params = {
             "serialNumber": self.device_serial_number,
             "sessionId": self.interface_reader.session_logger.session_id
@@ -221,7 +222,7 @@ class EventHandler:
                 image = open(
                     self.interface_reader.session_logger.log_path + "/" +
                     filename, "rb")
-                url = "http://192.168.0.152:8300/api/images"
+                url = "http://" + self.server_ip + ":8765/api/images"
                 result = requests.post(url,
                                        files={"image": image},
                                        params=params)
@@ -231,7 +232,7 @@ class EventHandler:
                 textFile = open(
                     self.interface_reader.session_logger.log_path + "/" +
                     filename, "rb")
-                url = "http://192.168.0.152:8400/api/files"
+                url = "http://" + self.server_ip + ":8765/api/files"
                 result = requests.post(url,
                                        files={"textFile": textFile},
                                        params=params)
