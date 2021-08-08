@@ -24,3 +24,4 @@ pyserial
 azure-cognitiveservices-speech
 playsound
 pybind11
+requests
