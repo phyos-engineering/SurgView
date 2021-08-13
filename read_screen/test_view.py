@@ -2,11 +2,11 @@
 Unit tests for the mapping class
 """
 
-import view
+from read_screen import view
 import unittest
 import cv2 as cv
 import glob
-import pytesseract
+
 
 class TestView(unittest.TestCase):
 

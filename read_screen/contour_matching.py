@@ -1,0 +1,119 @@
+import time
+import cv2 as cv
+import imutils
+from . import clean_image
+
+#TODO: Fix references to self
+
+def contour_matching(self, show_results: bool, template_flag: str):
+    start_time = time.time()
+
+    #
+    image = cv.imread(self.template_filepath)
+
+    image_gray_threshold = clean_image(image)
+
+    contours = cv.findContours(image_gray_threshold, cv.RETR_EXTERNAL,
+                               cv.CHAIN_APPROX_SIMPLE)
+    contours = contours[0] if len(contours) == 2 else contours[1]
+
+    largest_cnt = max(
+        contours,
+        key=cv.contourArea)  # Only grab contour with largest area
+
+    cv.drawContours(image=image,
+                    contours=[largest_cnt],
+                    contourIdx=0,
+                    color=(0, 255, 0),
+                    thickness=3)
+
+    self.show_result("Contour of target image", image,
+                     show_results)
+
+    # Get Area of Contour (Important
+    area = cv.contourArea(largest_cnt)
+
+    # Load Interface Image & Make Copy:
+
+    interface = self.current_view  # cv.imread(self.source_filepath)  # -> Switch out for current_view once everything is ready
+    interface_contours = interface.copy()
+    interface_result = interface.copy()
+
+    self.show_result("Interface Image", interface, show_results)
+
+    # Convert Interface Image to Grayscale
+    interface_gray = cv.cvtColor(interface, cv.COLOR_BGR2GRAY)
+    self.show_result("Interface Image After Grayscale Conversion",
+                     interface_gray, show_results)
+
+    # Apply Threshold to Grayscale Interface Image
+    ret1, thresh1 = cv.threshold(interface_gray, 127, 255, 0)
+    self.show_result("Threshold of Grayscale Image", thresh1, show_results)
+
+    # Find Contours In Interface Image With Applied Threshold
+    contours = cv.findContours(thresh1.copy(), cv.RETR_LIST,
+                               cv.CHAIN_APPROX_SIMPLE)
+    contours = imutils.grab_contours(contours)
+    cv.drawContours(interface_contours,
+                    contours,
+                    contourIdx=-1,
+                    color=(0, 255, 0),
+                    thickness=3)
+    self.show_result("Detected Contours In Interface", interface_contours,
+                     show_results)
+
+    # Establish lower and upper bound for contours areas detected in interface that match the target contour area
+    lower_bound = area * 0.90
+    upper_bound = area * 1.10
+
+    # Filter for contours that fall within bounds.
+    targets = []
+    for i in contours:
+        cnt = cv.contourArea(i)
+        if lower_bound <= cnt <= upper_bound:
+            targets.append(i)
+
+    cv.drawContours(interface_result,
+                    targets,
+                    -1,
+                    color=(0, 255, 0),
+                    thickness=3)
+    self.show_result("Target Contours", interface_result, show_results)
+
+    # Render rects on detected objects
+    rects_result = interface.copy()
+    for i in targets:
+        # Render a bounding rectangle for each target contour
+        x, y, w, h = cv.boundingRect(i)
+
+        # Capture region of interest within bounded rectangle (button)
+        button = rects_result[y:y + h, x:x + w]
+        self.show_result("button", button, show_results)
+
+        # Extract name of button using OCR
+        button_label = self.extract_text(button, template_flag)
+        cv.rectangle(rects_result,
+                     pt1=(x, y),
+                     pt2=(x + w, y + h),
+                     color=(0, 0, 255),
+                     thickness=2)
+
+        # Calculate & Render Center Point of Rectangle
+        center_x = int(x + w / 2)
+        center_y = int(y + h / 2)
+
+        cv.circle(rects_result, (center_x, center_y),
+                  radius=2,
+                  thickness=-1,
+                  color=(0, 0, 255))
+
+        # Add Widget To Map
+        self.gui_map.add_widget(button_label, center_x, center_y)
+
+    self.show_result("Target Area With Rects", rects_result, show_results)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print("Contour Matching - Elapsed Time: {}s".format(
+        round(elapsed_time, 2)))
+
+    return rects_result

@@ -9,13 +9,12 @@
 # conda_version   :4.9.2
 # ====================================================================================================================
 # from speech import SpeechEngine
-from view import UIReader
+from read_screen.view import UIReader
 from controller import SerialController
 from playsound import playsound
 import azure_speech
 import utils
 import json
-import time
 
 
 class EventHandler:
