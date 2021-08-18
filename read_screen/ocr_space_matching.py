@@ -1,6 +1,7 @@
 import time
 import os
 import requests
+import jsbeautifier
 
 def ocr_space_matching(self):
     """
@@ -11,11 +12,17 @@ def ocr_space_matching(self):
     start_time = time.time()
     for fn in os.listdir(directory):
         if fn.endswith(".jpg") or fn.endswith(".png"):
-            # opens home page root templates and saves a json of the ocr_space result
+            # opens each home page root template and requests ocr.space processing
             num_images += 1
             parsed_result = ocr_space_file_request(filename=fn)
+            # creates a one-line json file with the parsed result
             jsonFile = open(fn + ".json", "w")
             jsonFile.write(parsed_result)
+            jsonFile.close()
+            # overwrites that same one-line json file with a human-readable result
+            res = jsbeautifier.beautify_file(fn + ".json")
+            jsonFile = open(fn + ".json", "w")
+            jsonFile.write(res)
             jsonFile.close()
             #TODO: get coordinates of rectangle for each text element in the image in a format compatible with mapping.py
         else:
@@ -26,7 +33,7 @@ def ocr_space_matching(self):
         f"{num_images} different images were parsed using ocr.space. It took {round(elapsed_time, 1)} seconds, or {round(elapsed_time / num_images, 1)} seconds each.")
 
 
-def ocr_space_file_request(filename, overlay=False, api_key='0dc7f1aea588957', language='eng'):
+def ocr_space_file_request(filename, overlay=True, api_key='0dc7f1aea588957', language='eng'):
     """ OCR.space API request with local file.
         Python3.5 - not tested on 2.7
     :param filename: Your file path & name.
