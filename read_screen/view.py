@@ -139,38 +139,42 @@ class UIReader:
 
     def map_interface(self, show_flag=False):
 
-        #TODO: Fix relative filepaths, refactor rest of this function using map_interface_helper
+        #TODO: Fix relative filepaths
         start_time = time.time()
 
         template_fileroot = "../interface_assets/steris/home_page_templates/"
+        contour_names = ["main window","sources","destinations","square buttons","rect buttons"]
+        template_filenames = ["main_window.jpg","vitals_camera.jpg","surgical_display_1.jpg","mute.jpg","begin_case.jpg"]
+        template_flags = ["main_window_template","sources_template","destinations_template","bottom_buttons_template","bottom_buttons_template"]
 
-        # Find Main Window (main_window)
-        template_filename = "main_window.jpg"
-        self.map_interface_helper(self, "main window", template_fileroot+template_filename, show_flag,"main_window_template")
+        # Find Main Window, Sources, Destinations, Square Bottom Buttons, Rectangular Bottom Buttons
+        for i in range(len(contour_names)):
+            self.map_interface_helper(self, contour_names[i], template_fileroot+template_filenames[i], show_flag,template_flags[i])
+
         # print("FINDING MAIN WINDOW")
         # template_filepath = "../interface_assets/steris/home_page_templates/main_window.jpg"
         # self.session_logger.record_picture(self.contour_matching(template_filepath, show_results=show_flag,
         #                                                          template_flag="main_window_template"))
-        # Find Sources (sources)
-        print("FINDING SOURCES")
-        template_filepath = "../interface_assets/steris/home_page_templates/vitals_camera.jpg"
-        self.session_logger.record_picture(self.contour_matching(template_filepath,show_results=show_flag,
-                                                                 template_flag="sources_template"))
-        # Find Destinations (desitinations)
-        print("FINDING DESTINATIONS")
-        template_filepath = "../interface_assets/steris/home_page_templates/surgical_display_1.jpg"
-        self.session_logger.record_picture(self.contour_matching(template_filepath,show_results=show_flag,
-                                                                 template_flag="destinations_template"))
-        # Find Square Buttons (bottom_buttons)
-        print("FINDING SQUARE BUTTONS")
-        template_filepath = "../interface_assets/steris/home_page_templates/mute.jpg"
-        self.session_logger.record_picture(self.contour_matching(template_filepath,show_results=show_flag,
-                                                                 template_flag="bottom_buttons_template"))
-        # Find Rectangular Bottom Buttons (bottom_buttons)
-        print("FINDING RECT BUTTONS")
-        template_filepath = "../interface_assets/steris/home_page_templates/begin_case.jpg"
-        self.session_logger.record_picture(self.contour_matching(template_filepath,show_results=show_flag,
-                                                                 template_flag="bottom_buttons_template"))
+        # # Find Sources (sources)
+        # print("FINDING SOURCES")
+        # template_filepath = "../interface_assets/steris/home_page_templates/vitals_camera.jpg"
+        # self.session_logger.record_picture(self.contour_matching(template_filepath,show_results=show_flag,
+        #                                                          template_flag="sources_template"))
+        # # Find Destinations (desitinations)
+        # print("FINDING DESTINATIONS")
+        # template_filepath = "../interface_assets/steris/home_page_templates/surgical_display_1.jpg"
+        # self.session_logger.record_picture(self.contour_matching(template_filepath,show_results=show_flag,
+        #                                                          template_flag="destinations_template"))
+        # # Find Square Buttons (bottom_buttons)
+        # print("FINDING SQUARE BUTTONS")
+        # template_filepath = "../interface_assets/steris/home_page_templates/mute.jpg"
+        # self.session_logger.record_picture(self.contour_matching(template_filepath,show_results=show_flag,
+        #                                                          template_flag="bottom_buttons_template"))
+        # # Find Rectangular Bottom Buttons (bottom_buttons)
+        # print("FINDING RECT BUTTONS")
+        # template_filepath = "../interface_assets/steris/home_page_templates/begin_case.jpg"
+        # self.session_logger.record_picture(self.contour_matching(template_filepath,show_results=show_flag,
+        #                                                          template_flag="bottom_buttons_template"))
 
         end_time = time.time()
 
