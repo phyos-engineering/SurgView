@@ -2,20 +2,18 @@ import time
 import cv2 as cv
 import os
 import numpy as np
-from . import view
 
-#TODO: Fix reference to self.source_filepath
 
-def template_matching(self):
+def template_matching(source_filepath):
     """
     Search for widget in interface using template matching
     """
-
+    # source_filepath = "interface_assets/steris/home_page_templates/home_page_root.jpg"
     # Run template matching over entire dataset of assets
     start_time = time.time()
     image_dir = "../interface_assets/steris/home_page_templates/"  # TO DO: Temp make this dynamic
     interface_img = cv.imread(
-        self.source_filepath
+        source_filepath
     )  # TO DO: Put this file somewhere else in the future.
     result = interface_img.copy()
 

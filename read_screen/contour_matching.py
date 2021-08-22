@@ -1,7 +1,7 @@
 import time
 import cv2 as cv
 import imutils
-from . import clean_image
+from . import clean
 
 #TODO: Fix references to self
 
@@ -11,7 +11,7 @@ def contour_matching(self, show_results: bool, template_flag: str):
     #
     image = cv.imread(self.template_filepath)
 
-    image_gray_threshold = clean_image(image)
+    image_gray_threshold = clean(image)
 
     contours = cv.findContours(image_gray_threshold, cv.RETR_EXTERNAL,
                                cv.CHAIN_APPROX_SIMPLE)

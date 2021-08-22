@@ -18,7 +18,7 @@ class SessionLogger:
         self.root_path = "logs/"
         self.curr_datetime = datetime.datetime.now()
         self.log_path = self.root_path + self.curr_datetime.strftime("%d_%m_%Y_%H_%M_%SH")
-        os.mkdir(self.log_path)
+        os.makedirs(self.log_path)
 
     def record_picture(self, image):
         curr_time = datetime.datetime.now()
