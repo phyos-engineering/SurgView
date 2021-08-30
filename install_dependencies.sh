@@ -1,3 +1,5 @@
+sudo apt install python3-pip
+sudo apt install ffmpeg libsm6 libxext6 -y
 pip3 install opencv-python
 pip3 install pytesseract
 pip3 install numpy --upgrade
