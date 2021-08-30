@@ -42,6 +42,7 @@ Currently implemented with template matching and contour matching.
 # test all code in test_view
 # verify contour_matching still works after fixing map_interface
 # compare contour_matching+pytesseract time VS contour_matching+ocr.space time VS ocr_space_matching time
+# add widget needs to be done using the OUTPUT of each matching algorithm
 
 class UIReader:
     def __init__(self):

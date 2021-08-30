@@ -2,6 +2,8 @@ import time
 import cv2 as cv
 import imutils
 from . import clean
+from . import extract
+from . import view
 
 #TODO: Fix single reference to self.gui_map.add_widget(button_label, center_x, center_y) -- Add Widget To Map
 
@@ -95,7 +97,7 @@ def contour_matching(show_results: bool, template_flag: str,template_filepath = 
         show_result("button", button, show_results)
 
         # Extract name of button using OCR
-        button_label = self.extract_text(button, template_flag)
+        button_label = extract.extract_text(button, template_flag)
         cv.rectangle(rects_result,
                      pt1=(x, y),
                      pt2=(x + w, y + h),
@@ -111,8 +113,10 @@ def contour_matching(show_results: bool, template_flag: str,template_filepath = 
                   thickness=-1,
                   color=(0, 0, 255))
 
+        #TODO: ADDING WIDGET NEEDS TO HAPPEN OUTSIDE OF THIS METHOD
         # Add Widget To Map
-        self.gui_map.add_widget(button_label, center_x, center_y)
+        reader = view.UIReader()
+        reader.gui_map.add_widget(button_label, center_x, center_y)
 
     show_result("Target Area With Rects", rects_result, show_results)
     end_time = time.time()

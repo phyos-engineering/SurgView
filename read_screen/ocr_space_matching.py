@@ -10,6 +10,7 @@
 
 import time
 import os
+from . import view
 from .ocr_space_methods import ocr_space_file_request,make_beautified_json,ocr_request_error,ocr_space_text_map
 
 """
@@ -20,10 +21,14 @@ def ocr_space_matching(showResults = False):
     """
     Identify all lines of text in the image and assigns a location for each
     """
-    #TODO: add cleaning for each file before it is sent to ocr.space to avoid image exceeding size limit
+    #TODO:
+    # address edge cases where buttons that span two lines like Volume Up and Volume Down are represented as two buttons
+    # (maybe if there are two identical lines, remove them both instead of adding to the gui map)
+    # add cleaning for each file before it is sent to ocr.space to avoid image exceeding size limit
     # also can potentially add a source_filepath or source_directory input parameter so the directory can be changed
     # (reluctant to do so before refactoring other matching algorithms, which use a source_filepath, not source_directory)
     # (once tested sufficeintly, will likely change this to source_filepath)
+
     directory = '../interface_assets/steris/home_page_root_templates/'
     num_images = 0
     start_time = time.time()
@@ -45,6 +50,9 @@ def ocr_space_matching(showResults = False):
                     print(f'  All locations of text: {all_locations}')
             #TODO: make coordinates of rectangle for each text element in the image compatible with mapping.py
             # this will involve a refactoring of map_interface to be more generic (not just specific to contour_matching, see view.py)
+            # ADDING WIDGET NEEDS TO HAPPEN OUTSIDE OF THIS METHOD
+            #reader = view.UIReader()
+            #reader.gui_map.add_widget(button_label, center_x, center_y)
         else:
             continue
     end_time = time.time()

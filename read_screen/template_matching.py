@@ -3,7 +3,6 @@ import cv2 as cv
 import os
 import numpy as np
 
-
 def template_matching(source_filepath):
     """
     Search for widget in interface using template matching
