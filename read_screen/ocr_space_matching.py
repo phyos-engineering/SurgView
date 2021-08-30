@@ -61,4 +61,4 @@ def ocr_space_matching(showResults = False):
         f"\n {num_images} different images were parsed using ocr.space. It took {round(elapsed_time, 1)} seconds, or {round(elapsed_time / num_images, 1)} seconds each.")
     return 0 # if the image/s were successfully processed, return 0 indicating success
 
-ocr_space_matching(showResults=True)
+# ocr_space_matching(showResults=True)
