@@ -1,11 +1,13 @@
 import time
-import cv2 as cv
+import cv2
 import utils
 import logging
 import pytesseract
 import re
+import os
+from . import ocr_space_methods
 
-#TODO: implement extract text using ocr.space with filepath and image
+#TODO: test extract text using ocr.space vs pytesseract
 
 def extract_text(image_or_filepath,
                  flag: str,
@@ -26,7 +28,7 @@ def extract_text(image_or_filepath,
     if isinstance(image_or_filepath, str):
         # Open a file as an image
         filepath = image_or_filepath
-        image = cv.imread(filepath)
+        image = cv2.imread(filepath)
 
         # Extract the text from the image
         return text_extracter(image,ocr,flag,start_time)
@@ -44,10 +46,24 @@ def text_extracter(image,ocr,flag,start_time):
     return ocr_space_text_extracter(image,start_time)
 
 def ocr_space_text_extracter(image,start_time):
+    # TODO: test the method against py_text_extracter
+    # make a file from the image
+    fname = 'temp_file.jpg'
+    cv2.imwrite(fname, image)
 
-    #TODO: ocr_space_text_extracter
+    # extract text using the ocr.space file request
+    ocr_result = ocr_space_methods.ocr_space_file_request(filename=fname)
+    json_of_ocr_result = ocr_space_methods.make_beautified_json(ocr_result, target_image_filename=fname)
+    if (ocr_space_methods.ocr_request_error(json_of_ocr_result)):
+        pass
+        # if there was an error in processing the file, skip that image and print an error message
+    else:  # otherwise if the image was successfuly parsed by ocr.space, return all the words and their locations
+        all_lines, all_locations = ocr_space_methods.ocr_space_text_map(json_file_to_parse=json_of_ocr_result)
 
-    cleaned_text = "TODO"
+    # delete the temporary file
+    os.remove(fname)
+
+    cleaned_text = all_lines
     print(f"Extracting Text: {cleaned_text} ocr.space Elapsed Time: {elapsed_time(start_time)}")
     logging.debug(f"Extracting Text: {cleaned_text} ocr.space Elapsed Time: {elapsed_time(start_time)}")
 
@@ -55,7 +71,7 @@ def ocr_space_text_extracter(image,start_time):
 
 def py_text_extracter(image,flag,start_time):
     # Enlarge image (helps with OCR accuracy)
-    enlarged_image = cv.resize(src=image,
+    enlarged_image = cv2.resize(src=image,
                                dsize=(0, 0),
                                fx=3,
                                fy=3)
@@ -64,16 +80,16 @@ def py_text_extracter(image,flag,start_time):
 
     # Apply different thresholding technique based on button's features
     if flag == "bottom_buttons_template":
-        enlarged_image = cv.resize(src=image,
+        enlarged_image = cv2.resize(src=image,
                                    dsize=(0, 0),
                                    fx=9,
                                    fy=9)
 
-        gray_image = cv.cvtColor(enlarged_image.copy(), cv.COLOR_BGR2GRAY)
-        threshold = cv.threshold(src=gray_image,
+        gray_image = cv2.cvtColor(enlarged_image.copy(), cv2.COLOR_BGR2GRAY)
+        threshold = cv2.threshold(src=gray_image,
                                  thresh=127,
                                  maxval=255,
-                                 type=cv.THRESH_BINARY_INV)[1]
+                                 type=cv2.THRESH_BINARY_INV)[1]
     # self.show_result("ButtonThreshold", threshold, 1)
 
     # final_image = cv.medianBlur(src=final_image, ksize=1)

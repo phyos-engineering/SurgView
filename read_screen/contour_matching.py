@@ -3,13 +3,16 @@ import cv2 as cv
 import imutils
 from . import clean
 
-#TODO: Fix references to self
+#TODO: Fix single reference to self.gui_map.add_widget(button_label, center_x, center_y) -- Add Widget To Map
 
-def contour_matching(self, show_results: bool, template_flag: str):
+def contour_matching(show_results: bool, template_flag: str,template_filepath = None,source_filepath = None):
     start_time = time.time()
-
+    if template_filepath == None:
+        print("Must set a template filepath, eg. contour_matching(show_results, template_flag, template_filepath = path_to_your_target_contour,source_filepath = path_to_your_interface_to_map)")
+    if source_filepath == None:
+        print("Must set a source filepath, eg. contour_matching(show_results, template_flag, template_filepath = path_to_your_target_contour,source_filepath = path_to_your_interface_to_map)")
     #
-    image = cv.imread(self.template_filepath)
+    image = cv.imread(template_filepath)
 
     image_gray_threshold = clean(image)
 
@@ -27,7 +30,7 @@ def contour_matching(self, show_results: bool, template_flag: str):
                     color=(0, 255, 0),
                     thickness=3)
 
-    self.show_result("Contour of target image", image,
+    show_result("Contour of target image", image,
                      show_results)
 
     # Get Area of Contour (Important
@@ -35,20 +38,21 @@ def contour_matching(self, show_results: bool, template_flag: str):
 
     # Load Interface Image & Make Copy:
 
-    interface = self.current_view  # cv.imread(self.source_filepath)  # -> Switch out for current_view once everything is ready
+    #interface = self.current_view
+    interface = cv.imread(source_filepath)
     interface_contours = interface.copy()
     interface_result = interface.copy()
 
-    self.show_result("Interface Image", interface, show_results)
+    show_result("Interface Image", interface, show_results)
 
     # Convert Interface Image to Grayscale
     interface_gray = cv.cvtColor(interface, cv.COLOR_BGR2GRAY)
-    self.show_result("Interface Image After Grayscale Conversion",
+    show_result("Interface Image After Grayscale Conversion",
                      interface_gray, show_results)
 
     # Apply Threshold to Grayscale Interface Image
     ret1, thresh1 = cv.threshold(interface_gray, 127, 255, 0)
-    self.show_result("Threshold of Grayscale Image", thresh1, show_results)
+    show_result("Threshold of Grayscale Image", thresh1, show_results)
 
     # Find Contours In Interface Image With Applied Threshold
     contours = cv.findContours(thresh1.copy(), cv.RETR_LIST,
@@ -59,7 +63,7 @@ def contour_matching(self, show_results: bool, template_flag: str):
                     contourIdx=-1,
                     color=(0, 255, 0),
                     thickness=3)
-    self.show_result("Detected Contours In Interface", interface_contours,
+    show_result("Detected Contours In Interface", interface_contours,
                      show_results)
 
     # Establish lower and upper bound for contours areas detected in interface that match the target contour area
@@ -78,7 +82,7 @@ def contour_matching(self, show_results: bool, template_flag: str):
                     -1,
                     color=(0, 255, 0),
                     thickness=3)
-    self.show_result("Target Contours", interface_result, show_results)
+    show_result("Target Contours", interface_result, show_results)
 
     # Render rects on detected objects
     rects_result = interface.copy()
@@ -88,7 +92,7 @@ def contour_matching(self, show_results: bool, template_flag: str):
 
         # Capture region of interest within bounded rectangle (button)
         button = rects_result[y:y + h, x:x + w]
-        self.show_result("button", button, show_results)
+        show_result("button", button, show_results)
 
         # Extract name of button using OCR
         button_label = self.extract_text(button, template_flag)
@@ -110,10 +114,22 @@ def contour_matching(self, show_results: bool, template_flag: str):
         # Add Widget To Map
         self.gui_map.add_widget(button_label, center_x, center_y)
 
-    self.show_result("Target Area With Rects", rects_result, show_results)
+    show_result("Target Area With Rects", rects_result, show_results)
     end_time = time.time()
     elapsed_time = end_time - start_time
     print("Contour Matching - Elapsed Time: {}s".format(
         round(elapsed_time, 2)))
 
     return rects_result
+
+def show_result(title: str, image, is_enabled: bool):
+    """
+    See the result of an OpenCV procedure in a new window
+    :param title: Title of result window.
+    :param image: The image rendered in window.
+    :param is_enabled: Flag whether showing window result is enabled.
+    """
+    if is_enabled:
+        cv.imshow(title, image)
+        cv.waitKey(0)
+        cv.destroyWindow(title)

@@ -32,8 +32,16 @@ from . import ocr_space_matching
 """
 The UIReader maps out the screen locations of interface widgets using OpenCV.
 Currently implemented with template matching and contour matching. 
-TODO: ocr_space_matching
 """
+
+#TODO:
+# fix map_interface to generalize to any matching algorithm
+# add method for automatically getting (via screen capture? if possible?) an image of the interface
+# test if cleaning the image actually improves algorithm performance on ocr.space web app
+# change all cv references in read_screen to cv2 for clarity
+# test all code in test_view
+# verify contour_matching still works after fixing map_interface
+# compare contour_matching+pytesseract time VS contour_matching+ocr.space time VS ocr_space_matching time
 
 class UIReader:
     def __init__(self):
@@ -123,8 +131,9 @@ class UIReader:
         :param show_steps: Showing image transformations. 
         :param template_flag: flag needed to apply correct thresholding technique based on button feature
         """
+        source_filepath = "../interface_assets/steris/home_page_templates/home_page_root.jpg"
+
         if flag == "TEMPLATE_MATCHING":
-            source_filepath = "interface_assets/steris/home_page_templates/home_page_root.jpg"
             self.matching_algorithm = template_matching(source_filepath)
             # self.template_matching()
 
@@ -138,17 +147,26 @@ class UIReader:
             print("Mapping Method Provided Not Found")
 
     def map_interface(self, show_flag=False):
+        # TODO: map_interface is implemented specifically for contour_matching and needs to be generalized to any matching algorithm
 
-        #TODO: Fix relative filepaths
         start_time = time.time()
-
+        # specifiy the interface to map
+        source_filepath = "../interface_assets/steris/home_page_templates/home_page_root.jpg"
+        # specify where the contours in the interface (templates) to map are stored
         template_fileroot = "../interface_assets/steris/home_page_templates/"
+        #
         contour_names = ["main window","sources","destinations","square buttons","rect buttons"]
         template_filenames = ["main_window.jpg","vitals_camera.jpg","surgical_display_1.jpg","mute.jpg","begin_case.jpg"]
         template_flags = ["main_window_template","sources_template","destinations_template","bottom_buttons_template","bottom_buttons_template"]
 
         # Find Main Window, Sources, Destinations, Square Bottom Buttons, Rectangular Bottom Buttons
         for i in range(len(contour_names)):
+            # Finds the contour by the name of contour_name. The contour to map is stored in template_filepath
+            print(f"FINDING {contour_names[i].upper()}")
+            self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
+                                                                     template_flag=template_flags[i],
+                                                                     template_filepath = template_fileroot+template_filenames[i],
+                                                                     source_filepath = source_filepath))
             self.map_interface_helper(self, contour_names[i], template_fileroot+template_filenames[i], show_flag,template_flags[i])
 
         # print("FINDING MAIN WINDOW")
@@ -181,7 +199,7 @@ class UIReader:
         print("Elapsed Time - Full Scan: {}".format(end_time - start_time))
 
     def map_interface_helper(self,contour_name,template_filepath,template_flag,show_flag):
-        # Find Main Window
+        # Finds the contour by the name of contour_name. The contour to map is stored in template_filepath
         print(f"FINDING {contour_name.upper()}")
         self.session_logger.record_picture(self.contour_matching(template_filepath, show_results=show_flag,
                                                                  template_flag=template_flag))
