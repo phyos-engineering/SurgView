@@ -21,7 +21,6 @@ import utils
 import re
 from logs import SessionLogger
 import logging
-
 """
 The UIReader maps out the screen locations of interface widgets using OpenCV.
 """
@@ -35,12 +34,14 @@ class UIReader:
         self.program_name = None  # To Do: Exception Handling
         self.page_name = None  # To Do: Exception Handling
         self.assets_directory = "/interface_assets/"  # Directory location of templates.
-        self.gui_map = ScreenMap()  # Class in charge of tracking widgets identified by UIReader.
+        self.gui_map = ScreenMap(
+        )  # Class in charge of tracking widgets identified by UIReader.
         self.session_logger = SessionLogger()
         self.source_filepath = None
         self.template_filepath = None
         self.current_view = None
-        logging.basicConfig(filename=self.session_logger.log_path + "/session.log",
+        logging.basicConfig(filename=self.session_logger.log_path +
+                            "/session.log",
                             level=logging.DEBUG)
         # Config Video
         self.video_feed = cv.VideoCapture(0)
@@ -61,9 +62,32 @@ class UIReader:
         self.video_feed.grab()
         ret, frame = self.video_feed.retrieve()
 
-        self.current_view = frame
-        self.session_logger.record_picture(frame)
+        censored_image = self.remove_patient_data(frame)
+        self.current_view = censored_image
+        self.session_logger.record_picture(censored_image)
         time.sleep(1)
+
+    def remove_patient_data(self, uncensored_image):
+        """Censore Patient Data Into Top-Right Corner of Steris Interface"""
+
+        censored_image = uncensored_image.copy()
+
+        # Define dimensions of blurred area (rectangle shape)
+        topLeft = (0, 0)  #
+        bottomRight = (1000, 60)
+
+        x, y = topLeft[0], topLeft[1]
+        w, h = bottomRight[0] - topLeft[0], bottomRight[1] - topLeft[1]
+
+        # Define location of blurred area in image
+        ROI = uncensored_image[y:y + h, x:x + w]
+        # Generate blur
+        blur = cv.GaussianBlur(ROI, (51, 51), 0)
+
+        # Apply blur to target area
+        censored_image[y:y + h, x:x + w] = blur
+
+        return censored_image
 
     def record_session(self):  # This has to run on a separate thread
         fourcc = cv.VideoWriter_fourcc(*'XVID')
@@ -328,31 +352,36 @@ class UIReader:
         # Find Main Window
         print("FINDING MAIN WINDOW")
         self.template_filepath = "interface_assets/steris/home_page_templates/main_window.jpg"
-        self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
-                                                                 template_flag="main_window_template"))
+        self.session_logger.record_picture(
+            self.contour_matching(show_results=show_flag,
+                                  template_flag="main_window_template"))
         # Find Sources
         print("FINDING SOURCES")
         self.template_filepath = "interface_assets/steris/home_page_templates/vitals_camera.jpg"
-        self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
-                                                                 template_flag="sources_template"))
+        self.session_logger.record_picture(
+            self.contour_matching(show_results=show_flag,
+                                  template_flag="sources_template"))
 
         # Find Destinations
         print("FINDING DESTINATIONS")
         self.template_filepath = "interface_assets/steris/home_page_templates/surgical_display_1.jpg"
-        self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
-                                                                 template_flag="destinations_template"))
+        self.session_logger.record_picture(
+            self.contour_matching(show_results=show_flag,
+                                  template_flag="destinations_template"))
 
         # Find Square Buttons
         print("FINDING SQUARE BUTTONS")
         self.template_filepath = "interface_assets/steris/home_page_templates/mute.jpg"
-        self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
-                                                                 template_flag="bottom_buttons_template"))
+        self.session_logger.record_picture(
+            self.contour_matching(show_results=show_flag,
+                                  template_flag="bottom_buttons_template"))
 
         # Find Rectangular Bottom Buttons
         print("FINDING RECT BUTTONS")
         self.template_filepath = "interface_assets/steris/home_page_templates/begin_case.jpg"
-        self.session_logger.record_picture(self.contour_matching(show_results=show_flag,
-                                                                 template_flag="bottom_buttons_template"))
+        self.session_logger.record_picture(
+            self.contour_matching(show_results=show_flag,
+                                  template_flag="bottom_buttons_template"))
 
         end_time = time.time()
 
@@ -462,6 +491,7 @@ def main():
     viewer = UIReader()
     viewer.source_filepath = args["source"]
     viewer.template_filepath = args["template"]
+    viewer.query_frame()
     viewer.map_interface(args["show"])
     viewer.gui_map.get_map()
 
