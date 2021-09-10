@@ -137,6 +137,9 @@ class EventHandler:
         self.interface_reader.query_frame()
         self.interface_reader.map_interface()
 
+    def check_diff(self):
+        self.interface_reader.check_diff()
+
     def build_workflow(self):
         """
         Combine identified sources and destination
@@ -213,7 +216,8 @@ class EventHandler:
             "MapInterface": self.scan_interface,
             "SourceToDestination": self.source_to_destination,
             "SelectButton": self.select_button,
-            "Shutdown": self.shutdown
+            "Shutdown": self.shutdown,
+            "CheckDifference": self.check_diff
         }
 
         command_function = switch.get(intent, lambda: self.default_response)
