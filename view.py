@@ -40,9 +40,11 @@ class UIReader:
         self.source_filepath = None
         self.template_filepath = None
         self.current_view = None
+        self.old_view = None
         logging.basicConfig(filename=self.session_logger.log_path +
                             "/session.log",
                             level=logging.DEBUG)
+
         # Config Video
         self.video_feed = cv.VideoCapture(0)
         self.video_feed.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
@@ -50,6 +52,16 @@ class UIReader:
         print("Booting Up...")
         time.sleep(3)
         print("Booting Complete")
+
+    def check_diff(self):
+        # Check if image has changed used MSE
+        err = np.sum((self.old_view.astype("float") -
+                      self.current_view.astype("float"))**2)
+        err /= float(self.old_view.shape[0] * self.current_view.shape[1])
+        if err == 0:
+            print("NO CHANGE IN IMAGE")
+        else:
+            print("CHANGE IN IMAGE OBSERVED")
 
     def query_frame(self):
         """
@@ -60,9 +72,14 @@ class UIReader:
             exit()
 
         self.video_feed.grab()
+
         ret, frame = self.video_feed.retrieve()
 
         censored_image = self.remove_patient_data(frame)
+
+        if self.old_view is None:
+            self.old_view = censored_image
+
         self.current_view = censored_image
         self.session_logger.record_picture(censored_image)
         time.sleep(1)
