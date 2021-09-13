@@ -107,12 +107,12 @@ class EventHandler:
                 # playsound("prompt.mp3")
                 response = self.speech_engine.recognize_intent()
                 json_payload = json.loads(response)
-                print(json_payload)
-                self.process_intent(json_payload)
                 self.session_log.luis_ai_responses.append(
                     LuisResponse(self.num_luis_requests + 1, get_time(), json_payload)
                 )
                 self.num_luis_requests += 1
+                print(json_payload)
+                self.process_intent(json_payload)
 
     def check_if_registered(self):
         url = "http://192.168.0.152:8000/api/device/check"
