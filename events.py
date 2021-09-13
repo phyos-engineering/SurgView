@@ -21,12 +21,25 @@ import requests
 import json
 import time
 import logging
+import datetime
+from scribe import (
+    LuisResponse,
+    SessionLog,
+    MappedWorkflow,
+    MappedInterface,
+    EnhancedJSONEncoder,
+)
+
+
+def get_time() -> str:
+    now = datetime.datetime.now()
+    return now.strftime("%Y-%m-%d %H:%M:%S")
 
 
 class EventHandler:
     def __init__(self):
         """
-        Constructor. Initializes SpeechEngine, UIReader and SerialController 
+        Constructor. Initializes SpeechEngine, UIReader and SerialController
         Classes
         """
         self.speech_engine = azure_speech.SpeechEngine()
@@ -57,26 +70,49 @@ class EventHandler:
         self.python_impl = platform.python_implementation()
         self.application_version = "0.01"
 
+        self.session_log = SessionLog(get_time())
+
+        self.num_interface_mappings = 0
+        self.num_mapped_workflows = 0
+        self.num_luis_requests = 0
+
         # Device Status
         self.is_online = True
+        self.interface_reader.query_frame()
+        self.interface_reader.map_interface()
 
-        #print(self.register_device())
-        #self.register_device()
-        #self.check_if_registered()
+        # Log First Scan
+        self.session_log.mapped_interfaces.append(
+            MappedInterface(
+                self.num_interface_mappings + 1,
+                get_time(),
+                self.interface_reader.gui_map.get_map(),
+            )
+        )
+        self.num_interface_mappings += 1
+
+        # print(self.register_device())
+        # self.register_device()
+        # self.check_if_registered()
 
     def listen(self):
         """
-        Listen for activation word and prompt user with sound to give voice 
+        Listen for activation word and prompt user with sound to give voice
         command.
         """
         keep_listening = True
         while keep_listening:
             print("Listening for Activation Word...")
             if self.speech_engine.recognize_keyword():
-                playsound("prompt.mp3")
+                # playsound("prompt.mp3")
                 response = self.speech_engine.recognize_intent()
                 json_payload = json.loads(response)
+                print(json_payload)
                 self.process_intent(json_payload)
+                self.session_log.luis_ai_responses.append(
+                    LuisResponse(self.num_luis_requests + 1, get_time(), json_payload)
+                )
+                self.num_luis_requests += 1
 
     def check_if_registered(self):
         url = "http://192.168.0.152:8000/api/device/check"
@@ -87,7 +123,7 @@ class EventHandler:
 
     def register_device(self):
         url = "http://192.168.0.152:8000/api/device"
-        headers = {'Content-Type': 'application/json', 'Accept': 'json'}
+        headers = {"Content-Type": "application/json", "Accept": "json"}
         obj = {
             "serialNumber": self.device_serial_number,
             "boardModel": self.board_model,
@@ -101,14 +137,14 @@ class EventHandler:
             "pythonCompiler": self.python_compiler,
             "pythonImplementation": self.python_impl,
             "applicationVersion": self.application_version,
-            "online": self.is_online
+            "online": self.is_online,
         }
         result = requests.post(url, data=json.dumps(obj), headers=headers)
         logging.debug(result.headers)
 
     def process_intent(self, luis_ai_response: json):
         """
-        Process intent returned by LUIS.ai after voice command was given at 
+        Process intent returned by LUIS.ai after voice command was given at
         prompt.
         :param luis_ai_response: JSON file containing
         """
@@ -132,10 +168,20 @@ class EventHandler:
         self.interface_reader.gui_map.add_widget("4ksurgicaldisplay1", 1, 2)
         self.interface_reader.gui_map.add_widget("vitals", 3, 4)
 
-    def scan_interface(self):
+    def map_interface(self):
         print("Mapping Interface...")
         self.interface_reader.query_frame()
         self.interface_reader.map_interface()
+
+        # Log Mapping
+        self.session_log.mapped_interfaces.append(
+            MappedInterface(
+                self.num_interface_mappings + 1,
+                get_time(),
+                self.interface_reader.gui_map.get_map(),
+            )
+        )
+        self.num_interface_mappings += 1
 
     def check_diff(self):
         self.interface_reader.check_diff()
@@ -144,6 +190,28 @@ class EventHandler:
         """
         Combine identified sources and destination
         """
+        source_labels = []
+        destination_labels = []
+        label_worfklow = []
+        for items in self.source:
+            source_labels.append(items[0])
+
+        for items in self.destinations:
+            destination_labels.append(items[0])
+
+        label_worfklow += source_labels + destination_labels
+
+        self.session_log.mapped_workflows.append(
+            MappedWorkflow(
+                self.num_mapped_workflows + 1,
+                self.num_luis_requests,
+                self.num_interface_mappings,
+                get_time(),
+                label_worfklow,
+            )
+        )
+        self.num_mapped_workflows += 1
+
         self.workflow += self.source + self.destinations
 
     def source_to_destination(self):
@@ -156,19 +224,20 @@ class EventHandler:
 
         # First check for existence of a source and destination
         for entity in entities:
-            if entity['type'] == 'source':
-                source_label = utils.clean_string(entity['entity'])
+            if entity["type"] == "source":
+                to_int_label = utils.transform_to_int(entity["entity"])
+                source_label = utils.clean_string(to_int_label)
 
-                button = self.interface_reader.gui_map.locate_label(
-                    source_label)
+                button = self.interface_reader.gui_map.locate_label(source_label)
 
                 if button is not None:
                     self.source.append(button)
 
-            if entity['type'] == 'destination':
-                destination_label = utils.clean_string(entity['entity'])
-                button = self.interface_reader.gui_map.locate_label(
-                    destination_label)
+            if entity["type"] == "destination":
+                to_int_label = utils.transform_to_int(entity["entity"])
+                destination_label = utils.clean_string(to_int_label)
+
+                button = self.interface_reader.gui_map.locate_label(destination_label)
 
                 if button is not None:
                     self.destinations.append(button)
@@ -187,23 +256,27 @@ class EventHandler:
 
     def update_status(self):
         url = "http://192.168.0.152:8000/api/device/update"
-        headers = {'Content-Type': 'application/json', 'Accept': 'json'}
+        headers = {"Content-Type": "application/json", "Accept": "json"}
         online_status = None
         if self.is_online:
             online_status = False
         else:
             online_status = True
 
-        obj = {
-            "serialNumber": self.device_serial_number,
-            "online": online_status
-        }
+        obj = {"serialNumber": self.device_serial_number, "online": online_status}
         result = requests.patch(url, data=json.dumps(obj), headers=headers)
         logging.debug(result.headers)
 
     def shutdown(self):
         print("Shutting Down...")
-        #self.update_status()
+        json_log = json.dumps(self.session_log, cls=EnhancedJSONEncoder, indent=4)
+        with open(
+            self.interface_reader.session_logger.log_path + "/session.json", "w"
+        ) as outfile:
+            outfile.write(json_log)
+
+        print(json_log)
+        # self.update_status()
         exit(0)
 
     def match_case(self, intent: str):
@@ -213,11 +286,11 @@ class EventHandler:
         :return: method that should be executed by process_intent()
         """
         switch = {
-            "MapInterface": self.scan_interface,
+            "MapInterface": self.map_interface,
             "SourceToDestination": self.source_to_destination,
             "SelectButton": self.select_button,
             "Shutdown": self.shutdown,
-            "CheckDifference": self.check_diff
+            "CheckDifference": self.check_diff,
         }
 
         command_function = switch.get(intent, lambda: self.default_response)
@@ -229,5 +302,10 @@ class EventHandler:
             for i in self.workflow:
                 # print("Moving Mouse: {} {}".format(i[1]["x"], i[1]["y"]))
                 self.serial_controller.move_mouse(i[1]["x"], i[1]["y"])
+            # Clean Workflow
+            self.workflow.clear()
+            self.source.clear()
+            self.destinations.clear()
         if flag == 1:
             self.serial_controller.type_with_keyboard("Hello World!")
+            # Clean Workflow
