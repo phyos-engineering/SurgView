@@ -248,6 +248,23 @@ class EventHandler:
         else:
             print("No workflow to process")
 
+    def check_mouse(self):
+        entities = self.intent_state["entities"]
+        for entity in entities:
+            if entity["type"] == "target":
+                to_int_label = utils.transform_to_int(entity["entity"])
+                source_label = utils.clean_string(to_int_label)
+
+                button = self.interface_reader.gui_map.locate_label(source_label)
+
+                if button is not None:
+                    self.source.append(button)
+
+        if self.source is not None:
+            self.execute_workflow(0)
+        else:
+            print("No workflow to process")
+
     def default_response(self):
         print("Intent Not Found")
 
@@ -291,6 +308,7 @@ class EventHandler:
             "SelectButton": self.select_button,
             "Shutdown": self.shutdown,
             "CheckDifference": self.check_diff,
+            "CheckMouse": self.check_mouse,
         }
 
         command_function = switch.get(intent, lambda: self.default_response)
