@@ -302,6 +302,17 @@ class EventHandler:
         # self.update_status()
         exit(0)
 
+    def take_picture(self):
+        button = self.interface_reader.gui_map.locate_label("take_picture")
+        self.source.append(button)
+
+        if self.source is not None:
+            self.execute_workflow(0)
+        else:
+            print("No workflow to process")
+
+        # Add workflow
+
     def match_case(self, intent: str):
         """
         Switch statement in Python via dictionaries
@@ -315,6 +326,7 @@ class EventHandler:
             "Shutdown": self.shutdown,
             "CheckDifference": self.check_diff,
             "CheckMouse": self.check_mouse,
+            "TakePicture": self.take_picture,
         }
 
         command_function = switch.get(intent, lambda: self.default_response)
