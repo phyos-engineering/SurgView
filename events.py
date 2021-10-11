@@ -104,7 +104,7 @@ class EventHandler:
         while keep_listening:
             print("Listening for Activation Word...")
             if self.speech_engine.recognize_keyword():
-                #playsound("prompt.mp3")
+                playsound("prompt.mp3")
                 response = self.speech_engine.recognize_intent()
                 json_payload = json.loads(response)
                 self.session_log.luis_ai_responses.append(
