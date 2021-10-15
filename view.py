@@ -37,7 +37,7 @@ class UIReader:
         self.gui_map = (
             ScreenMap()
         )  # Class in charge of tracking widgets identified by UIReader.
-        self.gui_map.add_widget("take_picture", 608, 919)
+        self.gui_map.add_widget("takepicture", 608, 919)
         self.session_logger = SessionLogger()
         self.source_filepath = None
         self.template_filepath = None
