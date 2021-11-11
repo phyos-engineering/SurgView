@@ -13,6 +13,8 @@ from serial import Serial
 """
 The SerialController class allows us to interface with the Arduino Leonardo board via serial communication.
 """
+import time
+import asyncio
 
 
 class SerialController:
@@ -22,24 +24,33 @@ class SerialController:
 		"""
         self.serial_controller = Serial(port='/dev/ttyUSB0',
                                         baudrate=9600,
-                                        timeout=1)
+                                        timeout=None)
         self.serial_controller.flush()
 
-    def move_mouse(self, x_coordinate: int, y_coordinate: int):
+    async def read_arduino_buffer(self):
+        response = self.serial_controller.readline().decode('utf-8').rstrip()
+        return response
+
+    async def send_payload_to_board(self, x_coordinate: int,
+                                    y_coordinate: int):
         """
 		Sends command, in byte format, to Arduino Leonardo to move mouse.
 		:param x_coordinate: X screen coordinate of target widget.
 		:param y_coordinate: Y screen coordinate of target widget.
 		"""
-        mouse_command = "{} {} {}\n".format("mouse", x_coordinate,
-                                            y_coordinate, 0)
-        self.serial_controller.write(bytes(mouse_command, 'utf-8'))
+        mouse_command = "{} {} {} {}\n".format("mouse", x_coordinate,
+                                               y_coordinate, 0)
+        bytes_written = self.serial_controller.write(
+            bytes(mouse_command, 'utf-8'))
+        board_response = self.read_arduino_buffer()
 
-        arduino_response = self.serial_controller.readline().decode(
-            'utf-8').rstrip()
+        arduino_response = await board_response
         print(arduino_response)
         self.serial_controller.reset_input_buffer()
         self.serial_controller.reset_output_buffer()
+
+    def move_mouse(self, x_coordinate: int, y_coordinate: int):
+        asyncio.run(self.send_payload_to_board(x_coordinate, y_coordinate))
 
     def type_with_keyboard(
             self, text_content: str):  # TO DO: Fix how Arduino parses string.
