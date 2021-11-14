@@ -1,4 +1,3 @@
-#
 #!/usr/bin/env python
 # title           :events.py
 # description     :Enter Description Here

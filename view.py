@@ -37,7 +37,7 @@ class UIReader:
         self.gui_map = (
             ScreenMap()
         )  # Class in charge of tracking widgets identified by UIReader.
-        self.gui_map.add_widget("takepicture", 608, 919)
+        #self.gui_map.add_widget("takepicture", 608, 919)
         self.session_logger = SessionLogger()
         self.source_filepath = None
         self.template_filepath = None
@@ -407,6 +407,9 @@ class UIReader:
             self.contour_matching(show_results=show_flag,
                                   template_flag="bottom_buttons_template"))
 
+        # Find Take Picture and Record Video Buttons
+        self.template_matching()
+
         # Find Rectangular Bottom Buttons
         print("FINDING RECT BUTTONS")
         self.template_filepath = (
@@ -426,14 +429,12 @@ class UIReader:
 
         # Run template matching over entire dataset of assets
         start_time = time.time()
-        image_dir = "interface_assets/steris/home_page_templates/"  # TO DO: Temp make this dynamic
-        interface_img = cv.imread(
-            self.source_filepath
-        )  # TO DO: Put this file somewhere else in the future.
+        targets_dir = "interface_assets/steris/test/"  # TO DO: Temp make this dynamic
+        interface_img = self.current_view  # TO DO: Put this file somewhere else in the future.
         result = interface_img.copy()
 
-        for image in os.listdir(image_dir):
-            relative_path = os.path.join(image_dir, image)
+        for image in os.listdir(targets_dir):
+            relative_path = os.path.join(targets_dir, image)
             print("Finding: {}".format(image))
             widget_img = cv.imread(relative_path)
 
@@ -484,14 +485,28 @@ class UIReader:
                 thickness=1,
             )
 
+            center_x = int(xx + ww / 2)
+            center_y = int(yy + hh / 2)
+
+            cv.circle(
+                result,
+                (center_x, center_y),
+                radius=2,
+                thickness=-1,
+                color=(0, 0, 255),
+            )
+
+            self.gui_map.add_widget(image, center_x, center_y)
+
         # Show results
         end_time = time.time()
         elapsed_timed = end_time - start_time
         print("Elapsed Time: {}s".format(elapsed_timed))
         print("Average Processing Time Per Template: {}s".format(
-            elapsed_timed / len(os.listdir(image_dir))))
+            elapsed_timed / len(os.listdir(targets_dir))))
 
-        cv.waitKey(0)
+        #cv.imshow('result', result)
+        #cv.waitKey(0)
 
 
 def main():
@@ -533,7 +548,8 @@ def main():
     viewer.source_filepath = args["source"]
     viewer.template_filepath = args["template"]
     viewer.query_frame()
-    viewer.map_interface(args["show"])
+    #viewer.map_interface(args["show"])
+    viewer.template_matching()
     viewer.gui_map.print_map()
 
 
