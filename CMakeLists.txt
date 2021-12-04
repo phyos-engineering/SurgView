@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4...3.18)
 project(SurgView)
-add_subdirectory(pybind11)
+add_subdirectory(extern/pybind11)
 
 set(SPEECHSDK_ROOT $ENV{SPEECHSDK_ROOT})
 link_directories(${SPEECHSDK_ROOT}/lib/arm64 libasound.so.2)
