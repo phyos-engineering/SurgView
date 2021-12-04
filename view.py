@@ -506,7 +506,7 @@ class UIReader:
             elapsed_timed / len(os.listdir(targets_dir))))
 
         #cv.imshow('result', result)
-        #cv.waitKey(0)
+        # cv.waitKey(0)
 
 
 def main():

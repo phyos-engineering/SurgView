@@ -46,7 +46,9 @@ class SpeechEngine
 {
   private:
     std::shared_ptr<SpeechConfig> config;
+    std::shared_ptr<SpeechConfig> speechToTextConfig;
     std::shared_ptr<IntentRecognizer> intentRecognizer;
+    std::shared_ptr<SpeechRecognizer> speechToTextRecognizer;
     std::shared_ptr<KeywordRecognizer> keywordRecognizer;
     std::shared_ptr<KeywordRecognitionModel> keywordModel;
     std::shared_ptr<LanguageUnderstandingModel> model;
@@ -63,10 +65,23 @@ class SpeechEngine
       model = LanguageUnderstandingModel::FromAppId("87daaaad-ecf4-4a6c-8691-ec820953e4b2");
       intentRecognizer-> AddAllIntents(model);
 
+      // Speech To Text
+      speechToTextConfig = SpeechConfig::FromSubscription("961343d2f0e441029e60bbd1e3cfc669", "centralus");
+      speechToTextRecognizer = SpeechRecognizer::FromConfig(speechToTextConfig, audioConfig);
+
       // Keyword Configuration
       keywordModel = KeywordRecognitionModel::FromFile("1bccce7e-f4de-475b-ba2f-9eb9abaa1e08.table");
       auto keywordAudioConfig = AudioConfig::FromDefaultMicrophoneInput();
       keywordRecognizer = KeywordRecognizer::FromConfig(keywordAudioConfig);
+    }
+
+    std::string transcribeSpeech(){
+      std::shared_ptr<SpeechRecognitionResult> result;
+      cout << "Say something...\n";
+
+      result = speechToTextRecognizer->RecognizeOnceAsync().get();
+      string transcriptionResult = std::string(result->Text);
+      return transcriptionResult;
     }
 
     /*
@@ -136,28 +151,27 @@ class SpeechEngine
     }
 };
 
-// Creates the entry point that will be invoked when the Python interpreter imports an extension module.
+// // Creates the entry point that will be invoked when the Python interpreter imports an extension module.
 PYBIND11_MODULE(azure_speech, handle) {
   handle.doc() = "Python Wrapper API for Azure Cognitive Speech Services Written in C++";
 
   py::class_<SpeechEngine>(handle, "SpeechEngine")
     .def(py::init())
     .def("recognize_intent", &SpeechEngine::recognizeIntent)
-    .def("recognize_keyword", &SpeechEngine::recognizeKeyword);
+    .def("recognize_keyword", &SpeechEngine::recognizeKeyword)
+    .def("transcribe_speech", &SpeechEngine::transcribeSpeech);
 }
 
-/*
-int main(int argc, char **argv) 
-{
-  setlocale(LC_ALL, "");
-  SpeechEngine mic = SpeechEngine();
-  
-  while(1){
-    if(mic.recognizeKeyword()){
-      auto  content = mic.recognizeIntent();
-      cout << content << std::endl;
-    }
-  }
-  return 0;
-}
-*/
+// int main(int argc, char **argv) 
+// {
+//   setlocale(LC_ALL, "");
+//   SpeechEngine mic = SpeechEngine();
+
+//   while(1){
+//     if(mic.recognizeKeyword()){
+//       auto  content = mic.transcribeSpeech();
+//       cout << content << std::endl;
+//     }
+//   }
+//   return 0;
+// }

@@ -301,8 +301,28 @@ class EventHandler:
         # self.update_status()
         exit(0)
 
+        # Add workflow
+    def transcribe_voice(self):
+        playsound("prompt.mp3")
+        print('ENTERING TRANSCRIPTION MODE: SPEAK')
+
+        query = self.intent_state["query"]
+
+        # Call to Amazon Med Transcribe Here
+        amazon_transcribe_res = "This is an amazon medical transcribe response"
+        self.execute_workflow(1, query.replace(" ", ","))
+
     def take_picture(self):
-        button = self.interface_reader.gui_map.locate_label("take_picture")
+        button = self.interface_reader.gui_map.locate_label("takepicture.png")
+        self.source.append(button)
+
+        if self.source is not None:
+            self.execute_workflow(0)
+        else:
+            print("No workflow to process")
+
+    def record_video(self):
+        button = self.interface_reader.gui_map.locate_label("recordvideo.png")
         self.source.append(button)
 
         if self.source is not None:
@@ -311,7 +331,6 @@ class EventHandler:
             print("No workflow to process")
 
         # Add workflow
-
     def match_case(self, intent: str):
         """
         Switch statement in Python via dictionaries
@@ -326,12 +345,14 @@ class EventHandler:
             "CheckDifference": self.check_diff,
             "CheckMouse": self.check_mouse,
             "TakePicture": self.take_picture,
+            "RecordVideo": self.record_video,
+            "Transcribe": self.transcribe_voice
         }
 
         command_function = switch.get(intent, lambda: self.default_response)
         return command_function
 
-    def execute_workflow(self, flag: int):
+    def execute_workflow(self, flag: int, transcription: str = 'dummy_string'):
         self.build_workflow()
         if flag == 0:
             for i in self.workflow:
@@ -342,5 +363,5 @@ class EventHandler:
             self.source.clear()
             self.destinations.clear()
         if flag == 1:
-            self.serial_controller.type_with_keyboard("Hello World!")
+            self.serial_controller.type_with_keyboard(transcription)
             # Clean Workflow
