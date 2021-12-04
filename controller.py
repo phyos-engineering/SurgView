@@ -58,7 +58,7 @@ class SerialController:
 		Sends command, in byte format, to Arduino Leonardo to type text.
 		:param text_content: Text intended to fill a text field.
 		"""
-        keyboard_command = "{} {}\n".format("keyboard", text_content)
+        keyboard_command = f"keyboard {text_content}\n"
         self.serial_controller.write(bytes(keyboard_command, 'utf-8'))
 
         arduino_response = self.serial_controller.readline().decode(
