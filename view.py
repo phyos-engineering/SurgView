@@ -33,7 +33,8 @@ class UIReader:
         """
         self.program_name = None  # To Do: Exception Handling
         self.page_name = None  # To Do: Exception Handling
-        self.assets_directory = "/interface_assets/"  # Directory location of templates.
+        # Directory location of templates.
+        self.assets_directory = "/interface_assets/"
         self.gui_map = (
             ScreenMap()
         )  # Class in charge of tracking widgets identified by UIReader.
@@ -69,21 +70,21 @@ class UIReader:
         """
         Read one frame from the video feed (USB Capture Card) and update current_frame.  """
         if not self.video_feed.isOpened():
-            print("Cannot open camera")
-            exit()
+            print("Cannot open camera. Entering Transcription Mode")
+            # exit()
+        else:
+            self.video_feed.grab()
 
-        self.video_feed.grab()
+            ret, frame = self.video_feed.retrieve()
 
-        ret, frame = self.video_feed.retrieve()
+            censored_image = self.remove_patient_data(frame)
 
-        censored_image = self.remove_patient_data(frame)
+            if self.old_view is None:
+                self.old_view = censored_image
 
-        if self.old_view is None:
-            self.old_view = censored_image
-
-        self.current_view = censored_image
-        self.session_logger.record_picture(censored_image)
-        time.sleep(1)
+            self.current_view = censored_image
+            self.session_logger.record_picture(censored_image)
+            time.sleep(1)
 
     def remove_patient_data(self, uncensored_image):
         """Censore Patient Data Into Top-Right Corner of Steris Interface"""
@@ -430,7 +431,8 @@ class UIReader:
         # Run template matching over entire dataset of assets
         start_time = time.time()
         targets_dir = "interface_assets/steris/test/"  # TO DO: Temp make this dynamic
-        interface_img = self.current_view  # TO DO: Put this file somewhere else in the future.
+        # TO DO: Put this file somewhere else in the future.
+        interface_img = self.current_view
         result = interface_img.copy()
 
         for image in os.listdir(targets_dir):
@@ -522,8 +524,7 @@ def main():
     ap.add_argument(
         "--source",
         nargs="?",
-        default=
-        "interface_assets/steris/home_page_templates/home_page_root.jpg",
+        default="interface_assets/steris/home_page_templates/home_page_root.jpg",
         type=str,
         help="Source image where mapping will be performed.",
     )
@@ -548,7 +549,7 @@ def main():
     viewer.source_filepath = args["source"]
     viewer.template_filepath = args["template"]
     viewer.query_frame()
-    #viewer.map_interface(args["show"])
+    # viewer.map_interface(args["show"])
     viewer.template_matching()
     viewer.gui_map.print_map()
 

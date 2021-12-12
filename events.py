@@ -305,11 +305,12 @@ class EventHandler:
     def transcribe_voice(self):
         playsound("prompt.mp3")
         print('ENTERING TRANSCRIPTION MODE: SPEAK')
-        result = self.speech_engine.transcribe_speech()
+        result = ''
+        while result is not 'stop transcription':
+            result = self.speech_engine.transcribe_speech()
 
-        # Call to Amazon Med Transcribe Here
-        amazon_transcribe_res = "This is an amazon medical transcribe response"
-        self.execute_workflow(1, result.replace(" ", ","))
+            # Call to Amazon Med Transcribe Here
+            self.execute_workflow(1, result.replace(" ", ","))
 
     def take_picture(self):
         button = self.interface_reader.gui_map.locate_label("takepicture.png")

@@ -4,11 +4,11 @@ import json
 mic = azure_speech.SpeechEngine()
 
 # Play with command SELECT X AND SEND TO Y
-print("Check Activation Word - SAY ACTIVATION WORD: PHYPAD")
+print("Check Activation Word - SAY ACTIVATION WORD: HEY HERMES")
 if mic.recognize_keyword():
     print("CHECK SUCCESSFUL")
 
-print("Check Intent Recognition - SAY ACTIVATION WORD: PHYPAD")
+print("Check Intent Recognition - SAY ACTIVATION WORD: HEY HERMES")
 if mic.recognize_keyword():
     print("Say: Press Button X")
     result = mic.recognize_intent()
@@ -16,7 +16,7 @@ if mic.recognize_keyword():
     print(json_result)
     print("CHECK SUCCESSFUL")
 
-print("Check Transcription - SAY ACTIVATION WORD: PHYPAD")
+print("Check Transcription - SAY ACTIVATION WORD: HEY HERMES")
 if mic.recognize_keyword():
     print("Say: Press Button X ")
     result = mic.transcribe_speech()
