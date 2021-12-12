@@ -78,11 +78,10 @@ class EventHandler:
 
         # Device Status
         self.is_online = True
-        if (self.interface_reader.query_frame()):
+        if self.interface_reader.query_frame():
             self.interface_reader.map_interface()
 
-
-# Log First Scan
+        # Log First Scan
         self.session_log.mapped_interfaces.append(
             MappedInterface(
                 self.num_interface_mappings + 1,
@@ -303,12 +302,13 @@ class EventHandler:
         exit(0)
 
         # Add workflow
+
     def transcribe_voice(self):
         playsound("prompt.mp3")
-        print('ENTERING TRANSCRIPTION MODE: SPEAK')
-        while (1):
+        print("ENTERING TRANSCRIPTION MODE: SPEAK")
+        while 1:
             result = self.speech_engine.transcribe_speech()
-            if result == 'Stop transcription.':
+            if result == "Stop transcription.":
                 break
             # Call to Amazon Med Transcribe Here
             self.execute_workflow(1, result.replace(" ", ","))
@@ -316,6 +316,24 @@ class EventHandler:
 
     def take_picture(self):
         button = self.interface_reader.gui_map.locate_label("takepicture.png")
+        self.source.append(button)
+
+        if self.source is not None:
+            self.execute_workflow(0)
+        else:
+            print("No workflow to process")
+
+    def end_case(self):
+        button = self.interface_reader.gui_map.locate_label("endcase.png")
+        self.source.append(button)
+
+        if self.source is not None:
+            self.execute_workflow(0)
+        else:
+            print("No workflow to process")
+
+    def begin_case(self):
+        button = self.interface_reader.gui_map.locate_label("begincase.png")
         self.source.append(button)
 
         if self.source is not None:
@@ -333,6 +351,7 @@ class EventHandler:
             print("No workflow to process")
 
         # Add workflow
+
     def match_case(self, intent: str):
         """
         Switch statement in Python via dictionaries
@@ -348,13 +367,15 @@ class EventHandler:
             "CheckMouse": self.check_mouse,
             "TakePicture": self.take_picture,
             "RecordVideo": self.record_video,
-            "Transcribe": self.transcribe_voice
+            "Transcribe": self.transcribe_voice,
+            "BeginCase": self.begin_case,
+            "EndCase": self.end_case,
         }
 
         command_function = switch.get(intent, lambda: self.default_response)
         return command_function
 
-    def execute_workflow(self, flag: int, transcription: str = 'dummy_string'):
+    def execute_workflow(self, flag: int, transcription: str = "dummy_string"):
         self.build_workflow()
         if flag == 0:
             for i in self.workflow:
