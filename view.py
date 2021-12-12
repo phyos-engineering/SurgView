@@ -66,11 +66,12 @@ class UIReader:
         else:
             print("CHANGE IN IMAGE OBSERVED")
 
-    def query_frame(self):
+    def query_frame(self) -> bool:
         """
         Read one frame from the video feed (USB Capture Card) and update current_frame.  """
         if not self.video_feed.isOpened():
             print("Cannot open camera. Entering Transcription Mode")
+            return 0
             # exit()
         else:
             self.video_feed.grab()
@@ -85,6 +86,7 @@ class UIReader:
             self.current_view = censored_image
             self.session_logger.record_picture(censored_image)
             time.sleep(1)
+            return 1
 
     def remove_patient_data(self, uncensored_image):
         """Censore Patient Data Into Top-Right Corner of Steris Interface"""
@@ -524,7 +526,8 @@ def main():
     ap.add_argument(
         "--source",
         nargs="?",
-        default="interface_assets/steris/home_page_templates/home_page_root.jpg",
+        default=
+        "interface_assets/steris/home_page_templates/home_page_root.jpg",
         type=str,
         help="Source image where mapping will be performed.",
     )

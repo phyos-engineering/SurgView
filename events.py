@@ -78,10 +78,11 @@ class EventHandler:
 
         # Device Status
         self.is_online = True
-        self.interface_reader.query_frame()
-        self.interface_reader.map_interface()
+        if (self.interface_reader.query_frame()):
+            self.interface_reader.map_interface()
 
-        # Log First Scan
+
+# Log First Scan
         self.session_log.mapped_interfaces.append(
             MappedInterface(
                 self.num_interface_mappings + 1,
@@ -305,12 +306,13 @@ class EventHandler:
     def transcribe_voice(self):
         playsound("prompt.mp3")
         print('ENTERING TRANSCRIPTION MODE: SPEAK')
-        result = ''
-        while result is not 'stop transcription':
+        while (1):
             result = self.speech_engine.transcribe_speech()
-
+            if result == 'Stop transcription.':
+                break
             # Call to Amazon Med Transcribe Here
             self.execute_workflow(1, result.replace(" ", ","))
+        print("EXITING TRANSCRIPTION MODE")
 
     def take_picture(self):
         button = self.interface_reader.gui_map.locate_label("takepicture.png")
