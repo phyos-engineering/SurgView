@@ -80,8 +80,32 @@ class SpeechEngine
       cout << "Say something...\n";
 
       result = speechToTextRecognizer->RecognizeOnceAsync().get();
-      string transcriptionResult = std::string(result->Text);
-      return transcriptionResult;
+      if (result->Reason == ResultReason::RecognizedSpeech)
+      {
+        string transcriptionResult = std::string(result->Text);
+        return transcriptionResult;
+      }
+      else if (result->Reason == ResultReason::NoMatch)
+      {
+          cout << "NOMATCH: Speech could not be recognized." << std::endl;
+          return "";
+      }
+      else if (result->Reason == ResultReason::Canceled)
+      {
+          auto cancellation = CancellationDetails::FromResult(result);
+          cout << "CANCELED: Reason=" << (int)cancellation->Reason << std::endl;
+          if (cancellation->Reason == CancellationReason::Error)
+          {
+              cout << "CANCELED: ErrorCode=" << (int)cancellation->ErrorCode << std::endl;
+              cout << "CANCELED: ErrorDetails=" << cancellation->ErrorDetails << std::endl;
+              cout << "CANCELED: Did you update the subscription info?" << std::endl;
+              return "";
+          }
+          else {
+            return "";
+          }
+      }
+      return "";
     }
 
     /*
@@ -96,22 +120,22 @@ class SpeechEngine
 
       if (result->Reason == ResultReason::RecognizedIntent)
       {
-          cout << "RECOGNIZED: Text=" << result->Text << std::endl;
-          cout << "  Intent Id: " << result->IntentId << std::endl;
+          // cout << "RECOGNIZED: Text=" << result->Text << std::endl;
+          // cout << "  Intent Id: " << result->IntentId << std::endl;
           string intentResult = std::string(result->Properties.GetProperty(PropertyId::LanguageUnderstandingServiceResponse_JsonResult));
           return intentResult;
       }
 
       else if (result->Reason == ResultReason::RecognizedSpeech)
       {
-          cout << "RECOGNIZED: Text=" << result->Text << " (intent could not be recognized)" << std::endl;
-          return "Intent Could Not Be Recognized";
+          // cout << "RECOGNIZED: Text=" << result->Text << " (intent could not be recognized)" << std::endl;
+          return "";
       }
 
       else if (result->Reason == ResultReason::NoMatch)
       {
-          cout << "NOMATCH: Speech could not be recognized." << std::endl;
-          return "NOMATCH: Speech could not be recognized.";
+          // cout << "NOMATCH: Speech could not be recognized." << std::endl;
+          return "";
       }
 
       else if (result->Reason == ResultReason::Canceled)
@@ -121,9 +145,10 @@ class SpeechEngine
 
           if (cancellation->Reason == CancellationReason::Error)
           {
-              cout << "CANCELED: ErrorCode=" << (int)cancellation->ErrorCode << std::endl;
-              cout << "CANCELED: ErrorDetails=" << cancellation->ErrorDetails << std::endl;
-              cout << "CANCELED: Did you update the subscription info?" << std::endl;
+              // cout << "CANCELED: ErrorCode=" << (int)cancellation->ErrorCode << std::endl;
+              // cout << "CANCELED: ErrorDetails=" << cancellation->ErrorDetails << std::endl;
+              // cout << "CANCELED: Did you update the subscription info?" << std::endl;
+              return "";
           }
 
           string errorCode = std::to_string((int)cancellation->ErrorCode);
