@@ -87,7 +87,8 @@ class EventHandler:
                 self.num_interface_mappings + 1,
                 get_time(),
                 self.interface_reader.gui_map.get_map(),
-            ))
+            )
+        )
         self.num_interface_mappings += 1
 
         # print(self.register_device())
@@ -107,8 +108,8 @@ class EventHandler:
                 response = self.speech_engine.recognize_intent()
                 json_payload = json.loads(response)
                 self.session_log.luis_ai_responses.append(
-                    LuisResponse(self.num_luis_requests + 1, get_time(),
-                                 json_payload))
+                    LuisResponse(self.num_luis_requests + 1, get_time(), json_payload)
+                )
                 self.num_luis_requests += 1
                 print(json_payload)
                 self.process_intent(json_payload)
@@ -178,7 +179,8 @@ class EventHandler:
                 self.num_interface_mappings + 1,
                 get_time(),
                 self.interface_reader.gui_map.get_map(),
-            ))
+            )
+        )
         self.num_interface_mappings += 1
 
     def check_diff(self):
@@ -206,7 +208,8 @@ class EventHandler:
                 self.num_interface_mappings,
                 get_time(),
                 label_worfklow,
-            ))
+            )
+        )
         self.num_mapped_workflows += 1
 
         self.workflow += self.source + self.destinations
@@ -225,8 +228,7 @@ class EventHandler:
                 to_int_label = utils.transform_to_int(entity["entity"])
                 source_label = utils.clean_string(to_int_label)
 
-                button = self.interface_reader.gui_map.locate_label(
-                    source_label)
+                button = self.interface_reader.gui_map.locate_label(source_label)
 
                 if button is not None:
                     self.source.append(button)
@@ -235,8 +237,7 @@ class EventHandler:
                 to_int_label = utils.transform_to_int(entity["entity"])
                 destination_label = utils.clean_string(to_int_label)
 
-                button = self.interface_reader.gui_map.locate_label(
-                    destination_label)
+                button = self.interface_reader.gui_map.locate_label(destination_label)
 
                 if button is not None:
                     self.destinations.append(button)
@@ -254,8 +255,7 @@ class EventHandler:
                 to_int_label = utils.transform_to_int(entity["entity"])
                 source_label = utils.clean_string(to_int_label)
 
-                button = self.interface_reader.gui_map.locate_label(
-                    source_label)
+                button = self.interface_reader.gui_map.locate_label(source_label)
 
                 if button is not None:
                     self.source.append(button)
@@ -280,21 +280,16 @@ class EventHandler:
         else:
             online_status = True
 
-        obj = {
-            "serialNumber": self.device_serial_number,
-            "online": online_status
-        }
+        obj = {"serialNumber": self.device_serial_number, "online": online_status}
         result = requests.patch(url, data=json.dumps(obj), headers=headers)
         logging.debug(result.headers)
 
     def shutdown(self):
         print("Shutting Down...")
-        json_log = json.dumps(self.session_log,
-                              cls=EnhancedJSONEncoder,
-                              indent=4)
+        json_log = json.dumps(self.session_log, cls=EnhancedJSONEncoder, indent=4)
         with open(
-                self.interface_reader.session_logger.log_path +
-                "/session.json", "w") as outfile:
+            self.interface_reader.session_logger.log_path + "/session.json", "w"
+        ) as outfile:
             outfile.write(json_log)
 
         print(json_log)
@@ -308,7 +303,7 @@ class EventHandler:
         print("ENTERING TRANSCRIPTION MODE: SPEAK")
         while 1:
             result = self.speech_engine.transcribe_speech()
-            if result == "Stop transcription.":
+            if result == "Hermes.":
                 break
             # Call to Amazon Med Transcribe Here
             self.execute_workflow(1, result.replace(" ", ","))
