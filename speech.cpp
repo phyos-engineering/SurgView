@@ -9,7 +9,6 @@ using namespace Microsoft::CognitiveServices::Speech;
 using namespace Microsoft::CognitiveServices::Speech::Audio;
 using namespace Microsoft::CognitiveServices::Speech::Intent;
 
-
 /*
  * USAGE IN PYTHON3+: 
  *
@@ -87,8 +86,8 @@ class SpeechEngine
       }
       else if (result->Reason == ResultReason::NoMatch)
       {
-          cout << "NOMATCH: Speech could not be recognized." << std::endl;
-          return "";
+          cout << "NOMATCH: Speech could not be recognized...\n";
+          return std::string(" ");
       }
       else if (result->Reason == ResultReason::Canceled)
       {
